@@ -3,7 +3,7 @@
 	"name": "Opener",
 	"version": "1.0.4",
 	"minAppVersion": "0.15.9",
-	"description": "Opens pdf in default app",
+	"description": "Opens pdf in default app and open md in new tabs",
 	"author": "Aidan Gibson",
 	"authorUrl": "https://github.com/aidan-gibson",
 	"isDesktopOnly": false

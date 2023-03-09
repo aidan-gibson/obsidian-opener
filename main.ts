@@ -68,8 +68,6 @@ export default class Opener extends Plugin {
 						);
 						// else open in new tab
 
-						// TODO test diff obsid windows being open, diff file types like html (also using html viewer in obsid) etc
-
 						//default behavior but new tab
 						if (!sameFile && !openElsewhere) {
 							oldopenFile &&

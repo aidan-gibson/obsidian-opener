@@ -23,7 +23,19 @@ npm run build
 ```
 
 # ToDo:
-- [ ] settings (toggle openpdfwdefaultapp on/off)
+- [ ] settings (Toggle openpdf and open newtab on/off for ppl who just want one of the features).
 - [ ] test mobile
 - [ ] test with common plugins etc
 - [ ] add to community plugins
+- [ ] html viewer plugin
+
+# Notes to Self
+`git commit -am "commit msg" && git push` as per usual
+
+
+`git tag 1.0.4` (and update manifest.json + package.json) (automate this)
+`git push origin --tags` github releases won't drop new release unless this is done.
+
+test using vault 123; main vault is linked to github releases via BRAT
+
+also updating dependencies & obsid itself etc, also eslint yadda yadda.
