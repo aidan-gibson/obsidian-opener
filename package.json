@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-opener",
-	"version": "1.0.2",
+	"version": "1.0.4",
 	"description": "Opens pdf in default app",
 	"main": "main.js",
 	"scripts": {
