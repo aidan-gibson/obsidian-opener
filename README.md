@@ -10,7 +10,7 @@ Lots of partial implementations of this exist (ie, QuickSwitcher++ can open new 
 
 
 todo: 
-for md: switch to existing tab in window or open in new tab
+
 settings (toggle openpdfwdefaultapp on/off)
 mobile?
 add to community plugins

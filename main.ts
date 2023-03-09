@@ -58,7 +58,9 @@ export default class Opener extends Plugin {
 									matchesMarkdownFile ||
 									matchesNonMarkdownFile
 								) {
-									app.workspace.setActiveLeaf(leaf);
+									app.workspace.setActiveLeaf(leaf, {
+										focus: true,
+									});
 									openElsewhere = true;
 									return;
 								}
@@ -66,7 +68,7 @@ export default class Opener extends Plugin {
 						);
 						// else open in new tab
 
-						// TODO test diff obsid windows being open, aliases, diff file types like html (also using html viewer in obsid) etc
+						// TODO test diff obsid windows being open, diff file types like html (also using html viewer in obsid) etc
 
 						//default behavior but new tab
 						if (!sameFile && !openElsewhere) {
