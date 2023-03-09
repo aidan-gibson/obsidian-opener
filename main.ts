@@ -30,11 +30,54 @@ export default class Opener extends Plugin {
 						app.openWithDefaultApp(file.path);
 						return;
 					}
-					// else open in new tab (unless it's already open in another tab, then switch)
-					// test diff obsid windows being open
+					// if clicking on link with same path as active file in view, defer to default behavior (ie headings, blocks, etc). file.path is thing being opened. app.workspace.getActiveFile()?.path is currently opened tab filepath.
+					let sameFile =
+						file.path == app.workspace.getActiveFile()?.path;
+					let openElsewhere = false;
+					if (sameFile) {
+						oldopenFile &&
+							oldopenFile.apply(this, [file, openState]);
+						return;
+					} else if (!sameFile) {
+						// else if already open in another tab, switch to that tab
+						app.workspace.iterateAllLeaves(
+							(leaf: WorkspaceLeaf) => {
+								const viewState = leaf.getViewState();
+								const matchesMarkdownFile =
+									viewState.type === "markdown" &&
+									viewState.state?.file?.endsWith(
+										`${file.basename}.md`
+									);
+								const matchesNonMarkdownFile =
+									viewState.type !== "markdown" &&
+									viewState.state?.file?.endsWith(
+										file.basename
+									);
 
-					//default behavior
-					oldopenFile && oldopenFile.apply(this, [file, openState]);
+								if (
+									matchesMarkdownFile ||
+									matchesNonMarkdownFile
+								) {
+									app.workspace.setActiveLeaf(leaf);
+									openElsewhere = true;
+									return;
+								}
+							}
+						);
+						// else open in new tab
+
+						// TODO test diff obsid windows being open, aliases, diff file types like html (also using html viewer in obsid) etc
+
+						//default behavior but new tab
+						if (!sameFile && !openElsewhere) {
+							oldopenFile &&
+								oldopenFile.apply(
+									this.app.workspace.getLeaf("tab"),
+									[file, openState]
+								);
+							return;
+						}
+					}
 				};
 			},
 		});
