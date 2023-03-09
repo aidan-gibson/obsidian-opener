@@ -1,7 +1,7 @@
 {
-	"id": "opener",
+	"id": "obsidian-opener",
 	"name": "Opener",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"minAppVersion": "0.15.9",
 	"description": "Opens pdf in default app",
 	"author": "Aidan Gibson",
