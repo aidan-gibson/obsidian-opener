@@ -29,6 +29,7 @@ export default class Opener extends Plugin {
 
 	onunload(): void {
 		this.uninstallMonkeyPatch && this.uninstallMonkeyPatch();
+		console.log("unloading " + this.manifest.name + " plugin");
 	}
 
 	async loadSettings() {
@@ -46,7 +47,7 @@ export default class Opener extends Plugin {
 	}
 
 	monkeyPatchopenFile() {
-		console.log(this.settings.PDFApp);
+		// console.log(this.settings.PDFApp);
 		let parentThis = this;
 		this.uninstallMonkeyPatch = around(WorkspaceLeaf.prototype, {
 			openFile(oldopenFile) {
@@ -56,10 +57,10 @@ export default class Opener extends Plugin {
 						app.openWithDefaultApp(file.path);
 						return;
 					}
+					let openElsewhere = false;
 					// if clicking on link with same path as active file in view, defer to default behavior (ie headings, blocks, etc). file.path is thing being opened. app.workspace.getActiveFile()?.path is currently opened tab filepath.
 					let sameFile =
 						file.path == app.workspace.getActiveFile()?.path;
-					let openElsewhere = false;
 					if (sameFile) {
 						oldopenFile &&
 							oldopenFile.apply(this, [file, openState]);
@@ -76,9 +77,8 @@ export default class Opener extends Plugin {
 									);
 								const matchesNonMarkdownFile =
 									viewState.type !== "markdown" &&
-									viewState.state?.file?.endsWith(
-										file.basename
-									);
+									viewState.state.file === file.name;
+								// viewState.state?.file?.endsWith(file.basename);
 
 								if (
 									matchesMarkdownFile ||
@@ -87,6 +87,7 @@ export default class Opener extends Plugin {
 									app.workspace.setActiveLeaf(leaf, {
 										focus: true,
 									});
+									// console.log("openElsewhere");
 									openElsewhere = true;
 									return;
 								}
@@ -96,6 +97,7 @@ export default class Opener extends Plugin {
 
 						//default behavior but new tab
 						if (!sameFile && !openElsewhere) {
+							// console.log("default behavior but new tab");
 							oldopenFile &&
 								oldopenFile.apply(
 									this.app.workspace.getLeaf("tab"),
