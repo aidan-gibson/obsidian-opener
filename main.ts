@@ -7,13 +7,23 @@ import {
 	MarkdownView,
 	Notice,
 	TFile,
+	PluginSettingTab,
+	Setting,
 } from "obsidian";
 import { around } from "monkey-around";
+import { OpenerSettingTab } from "./settings";
+import { DEFAULT_SETTINGS } from "./constants";
+import { OpenerSetting } from "./types";
 
 export default class Opener extends Plugin {
+	settings: OpenerSetting;
 	uninstallMonkeyPatch: () => void;
 
 	async onload() {
+		console.log("loading " + this.manifest.name + " plugin");
+		await this.loadSettings();
+		// this.migrateSettings();
+		this.addSettingTab(new OpenerSettingTab(this.app, this));
 		this.monkeyPatchopenFile();
 	}
 
@@ -21,6 +31,15 @@ export default class Opener extends Plugin {
 		this.uninstallMonkeyPatch && this.uninstallMonkeyPatch();
 	}
 
+	async loadSettings() {
+		// At first startup, `data` is `null` because data.json does not exist.
+		let data = (await this.loadData()) as OpenerSetting | null;
+		//Check for existing settings
+		// if (data == undefined) {
+		// 	data = { showedMobileNotice: true } as any;
+		// }
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+	}
 	monkeyPatchopenFile() {
 		this.uninstallMonkeyPatch = around(WorkspaceLeaf.prototype, {
 			openFile(oldopenFile) {
