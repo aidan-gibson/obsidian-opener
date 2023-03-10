@@ -40,11 +40,18 @@ export default class Opener extends Plugin {
 		// }
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
 	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
+
 	monkeyPatchopenFile() {
+		console.log(this.settings.PDFApp);
+		let parentThis = this;
 		this.uninstallMonkeyPatch = around(WorkspaceLeaf.prototype, {
 			openFile(oldopenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
-					if (file.extension == "pdf") {
+					if (parentThis.settings.PDFApp && file.extension == "pdf") {
 						// @ts-ignore
 						app.openWithDefaultApp(file.path);
 						return;

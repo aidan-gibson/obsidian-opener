@@ -24,6 +24,7 @@ npm run build
 
 # ToDo:
 - [ ] settings (Toggle openpdf and open newtab on/off for ppl who just want one of the features).
+  - if open PDFApp == false; make sure it still opens in new tab
 - [ ] test mobile
 - [ ] test with common plugins etc
 - [ ] add to community plugins
