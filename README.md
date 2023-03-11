@@ -23,23 +23,17 @@ npm run build
 ```
 
 # ToDo:
-- [ ] move ts files into src
+
 - [ ] header (and presumably block links etc) don't take u to correct place if coming from another page
-- [ ] open link under cursor [to the right / in new window] (broken), 
+
 - create note to the right
 - [ ] test mobile
   - if works, update manifest.json 'isDesktopOnly'
-- [ ] test with common plugins etc
 - [ ] add to community plugins
 - [ ] html viewer plugin
 opening graph view ruins
-
-- if middle click or right click > open in new tab or QuickSwitcher++ cmd+enter, a new empty tab is opened
-- what if someone wants to open an existing tab in new window? current implementation won't let them. add option to treat windows as siloed (only look for existing tabs in current window), so ya can open a tab that exists in another window in a new window
-
+## Known issues
+* "open in new tab" when currently viewing that tab opens a "new tab" 
+* graph view doesn't open in new tab
 # Notes
 If there is a tab open in another Obsidian window which is minimized, it will look like nothing is happening. I don't have the ability to unminimize the other window as an Obsidian plug-in (afaik).
-
-# Notes on Other Plugins
-* QuickSwitcher++
-  * Turn off "Default to open in new tab"; else you will get extra empty tabs
