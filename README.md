@@ -33,7 +33,6 @@ npm run build
 - [ ] html viewer plugin
 opening graph view ruins
 ## Known issues
-* "open in new tab" (via context OR quickswitcher) when that tab is already open opens a "new tab" (out of focus but still; annoying, fix)
 * graph view doesn't open in new tab
 # Notes
 If there is a tab open in another Obsidian window which is minimized, it will look like nothing is happening. I don't have the ability to unminimize the other window as an Obsidian plug-in (afaik).

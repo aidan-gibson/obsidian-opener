@@ -26,7 +26,7 @@ export default class Opener extends Plugin {
 		// this.migrateSettings();
 		this.addSettingTab(new OpenerSettingTab(this.app, this));
 		this.monkeyPatchopenFile();
-		// this.monkeyPatchopenLinkText();
+		this.monkeyPatchopenLinkText();
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		// (this.app as any).commands.removeCommand(
 		// 	`editor:open-link-in-new-leaf`
@@ -56,7 +56,7 @@ export default class Opener extends Plugin {
 		this.uninstallMonkeyPatch = around(WorkspaceLeaf.prototype, {
 			openFile(oldopenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
-					console.log(openState);
+					// console.log(openState);
 					if (parentThis.settings.PDFApp && file.extension == 'pdf') {
 						// @ts-ignore
 						app.openWithDefaultApp(file.path);
@@ -117,7 +117,33 @@ export default class Opener extends Plugin {
 		});
 	}
 
-	// fixes editor:open-link-in-new-leaf, context menu > open in new tab, etc, command palette "open link under cursor in new tab"
+	// if note already exists, monkeyPatchopenFile() does its job and moves to that one. but openLinkText() with options selected for new tab (invoked via Right Click > Open in New Tab or Quick Switcher Cmd+Enter, etc) will still open a new tab.
+	monkeyPatchopenLinkText() {
+		let parentThis = this;
+		this.uninstallMonkeyPatch = around(Workspace.prototype, {
+			openLinkText(oldOpenLinkText) {
+				return async function (
+					linkText: string,
+					sourcePath: string,
+					newLeaf?: PaneType | boolean,
+					openViewState?: OpenViewState
+				) {
+					console.log(newLeaf);
+					console.log(openViewState);
+					if(newLeaf == 'tab'){
+						newLeaf = false;
+					}
+					oldOpenLinkText &&
+						oldOpenLinkText.apply(this, [
+							linkText,
+							sourcePath,
+							newLeaf,
+							openViewState,
+						]);
+				};
+			},
+		});
+	}
 	// monkeyPatchopenLinkText() {
 	// 	let parentThis = this;
 	// 	this.uninstallMonkeyPatch = around(Workspace.prototype, {

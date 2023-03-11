@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-opener",
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"description": "Open links in new/existing tabs by default. Open PDFs in System App by default.",
 	"main": "main.js",
 	"scripts": {

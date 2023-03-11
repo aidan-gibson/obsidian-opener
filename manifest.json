@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-opener",
 	"name": "Opener",
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"minAppVersion": "0.15.9",
 	"description": "Open links in new/existing tabs by default. Open PDFs in System App by default.",
 	"author": "Aidan Gibson",
