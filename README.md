@@ -24,6 +24,7 @@ npm run build
 
 # ToDo:
 - [ ] move ts files into src
+- [ ] open link under cursor to the right / in new window (broken)
 - [ ] test mobile
   - if works, update manifest.json 'isDesktopOnly'
 - [ ] test with common plugins etc

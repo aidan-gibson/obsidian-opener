@@ -25,7 +25,7 @@ export default class Opener extends Plugin {
 		// this.migrateSettings();
 		this.addSettingTab(new OpenerSettingTab(this.app, this));
 		this.monkeyPatchopenFile();
-		// this.monkeyPatchopenLinkText();
+		this.monkeyPatchopenLinkText();
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		// (this.app as any).commands.removeCommand(
 		// 	`editor:open-link-in-new-leaf`
@@ -126,30 +126,29 @@ export default class Opener extends Plugin {
 		});
 	}
 
-	// fixes editor:open-link-in-new-leaf, context menu > open in new tab, etc
-	// monkeyPatchopenLinkText() {
-	// 	let parentThis = this;
-	// 	this.uninstallMonkeyPatch = around(Workspace.prototype, {
-	// 		openLinkText(oldOpenLinkText) {
-	// 			return async function (
-	// 				linkText: string,
-	// 				sourcePath: string,
-	// 				newLeaf?: boolean,
-	// 				openViewState?: OpenViewState
-	// 			) {
-	// 				// if (parentThis.settings.newTab) {
-	// 				// newLeaf = false;
-	// 				// }
-	// 				console.log("test");
-	// 				oldOpenLinkText &&
-	// 					oldOpenLinkText.apply(this, [
-	// 						linkText,
-	// 						sourcePath,
-	// 						newLeaf,
-	// 						openViewState,
-	// 					]);
-	// 			};
-	// 		},
-	// 	});
-	// }
+	// fixes editor:open-link-in-new-leaf, context menu > open in new tab, etc, command palette "open link under cursor in new tab"
+	monkeyPatchopenLinkText() {
+		let parentThis = this;
+		this.uninstallMonkeyPatch = around(Workspace.prototype, {
+			openLinkText(oldOpenLinkText) {
+				return async function (
+					linkText: string,
+					sourcePath: string,
+					newLeaf?: boolean,
+					openViewState?: OpenViewState
+				) {
+					if (parentThis.settings.newTab) {
+						newLeaf = false;
+					}
+					oldOpenLinkText &&
+						oldOpenLinkText.apply(this, [
+							linkText,
+							sourcePath,
+							newLeaf,
+							openViewState,
+						]);
+				};
+			},
+		});
+	}
 }
