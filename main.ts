@@ -77,9 +77,7 @@ export default class Opener extends Plugin {
 						// else if already open in another tab, switch to that tab
 						app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
 							if (leaf.getViewState().state?.file == file.name) {
-								app.workspace.setActiveLeaf(leaf, {
-									focus: true,
-								});
+								oldopenFile && oldopenFile.apply(leaf, [file, openState]);
 								openElsewhere = true;
 								return;
 							}
