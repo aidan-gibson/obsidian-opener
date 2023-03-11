@@ -1,15 +1,16 @@
 {
 	"name": "obsidian-opener",
-	"version": "1.0.11",
+	"version": "1.0.12",
 	"description": "Open links in new/existing tabs by default. Open PDFs in System App by default. Can open other file formats in System Apps if desired.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json"
+		"version": "node version-bump.mjs && git add manifest.json versions.json",
+		"release": "version"
 	},
 	"keywords": [],
-	"author": "",
+	"author": "Aidan Gibson",
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^16.11.6",
