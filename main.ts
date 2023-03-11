@@ -25,6 +25,7 @@ export default class Opener extends Plugin {
 		// this.migrateSettings();
 		this.addSettingTab(new OpenerSettingTab(this.app, this));
 		this.monkeyPatchopenFile();
+		// this.monkeyPatchopenLinkText();
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		// (this.app as any).commands.removeCommand(
 		// 	`editor:open-link-in-new-leaf`
@@ -49,7 +50,6 @@ export default class Opener extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
-		// this.monkeyPatchopenFile();
 	}
 
 	monkeyPatchopenFile() {
@@ -116,10 +116,7 @@ export default class Opener extends Plugin {
 						}
 					}
 					// default behavior
-					if (
-						!parentThis.settings.newTab &&
-						!parentThis.settings.PDFApp
-					) {
+					if (!parentThis.settings.newTab) {
 						oldopenFile &&
 							oldopenFile.apply(this, [file, openState]);
 						return;
@@ -128,4 +125,31 @@ export default class Opener extends Plugin {
 			},
 		});
 	}
+
+	// fixes editor:open-link-in-new-leaf, context menu > open in new tab, etc
+	// monkeyPatchopenLinkText() {
+	// 	let parentThis = this;
+	// 	this.uninstallMonkeyPatch = around(Workspace.prototype, {
+	// 		openLinkText(oldOpenLinkText) {
+	// 			return async function (
+	// 				linkText: string,
+	// 				sourcePath: string,
+	// 				newLeaf?: boolean,
+	// 				openViewState?: OpenViewState
+	// 			) {
+	// 				// if (parentThis.settings.newTab) {
+	// 				// newLeaf = false;
+	// 				// }
+	// 				console.log("test");
+	// 				oldOpenLinkText &&
+	// 					oldOpenLinkText.apply(this, [
+	// 						linkText,
+	// 						sourcePath,
+	// 						newLeaf,
+	// 						openViewState,
+	// 					]);
+	// 			};
+	// 		},
+	// 	});
+	// }
 }
