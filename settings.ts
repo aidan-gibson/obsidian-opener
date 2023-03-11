@@ -29,9 +29,9 @@ export class OpenerSettingTab extends PluginSettingTab {
 				})
 			);
 		new Setting(containerEl)
-			.setName("All Supported Default App")
+			.setName("Open everything outside of Obsidian")
 			.setDesc(
-				"Enable to open all obsidian supported extensions with system viewer instead. Disable for default behavior (open pdfs in Obsidian)."
+				"Enable to open all obsidian supported extensions with system viewer instead. Disable for default behavior (open within Obsidian)."
 			)
 			.addToggle((toggle) =>
 				toggle.setValue(plugin.settings.allExt).onChange((value) => {
