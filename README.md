@@ -24,7 +24,9 @@ npm run build
 
 # ToDo:
 - [ ] move ts files into src
-- [ ] open link under cursor to the right / in new window (broken)
+- [ ] header (and presumably block links etc) don't take u to correct place if coming from another page
+- [ ] open link under cursor [to the right / in new window] (broken), 
+- create note to the right
 - [ ] test mobile
   - if works, update manifest.json 'isDesktopOnly'
 - [ ] test with common plugins etc

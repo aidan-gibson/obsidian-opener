@@ -9,23 +9,24 @@ import {
 	TFile,
 	PluginSettingTab,
 	Setting,
-} from "obsidian";
-import { around } from "monkey-around";
-import { OpenerSettingTab } from "./settings";
-import { DEFAULT_SETTINGS } from "./constants";
-import { OpenerSetting } from "./types";
+	PaneType,
+} from 'obsidian';
+import { around } from 'monkey-around';
+import { OpenerSettingTab } from './settings';
+import { DEFAULT_SETTINGS } from './constants';
+import { OpenerSetting } from './types';
 
 export default class Opener extends Plugin {
 	settings: OpenerSetting;
 	uninstallMonkeyPatch: () => void;
 
 	async onload() {
-		console.log("loading " + this.manifest.name + " plugin");
+		console.log('loading ' + this.manifest.name + ' plugin');
 		await this.loadSettings();
 		// this.migrateSettings();
 		this.addSettingTab(new OpenerSettingTab(this.app, this));
 		this.monkeyPatchopenFile();
-		this.monkeyPatchopenLinkText();
+		// this.monkeyPatchopenLinkText();
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		// (this.app as any).commands.removeCommand(
 		// 	`editor:open-link-in-new-leaf`
@@ -35,16 +36,12 @@ export default class Opener extends Plugin {
 
 	onunload(): void {
 		this.uninstallMonkeyPatch && this.uninstallMonkeyPatch();
-		console.log("unloading " + this.manifest.name + " plugin");
+		console.log('unloading ' + this.manifest.name + ' plugin');
 	}
 
 	async loadSettings() {
 		// At first startup, `data` is `null` because data.json does not exist.
-		let data = (await this.loadData()) as OpenerSetting | null;
-		//Check for existing settings
-		// if (data == undefined) {
-		// 	data = { showedMobileNotice: true } as any;
-		// }
+		const data = (await this.loadData()) as OpenerSetting | null;
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
 	}
 
@@ -53,72 +50,70 @@ export default class Opener extends Plugin {
 	}
 
 	monkeyPatchopenFile() {
-		let parentThis = this;
+		// TODO
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
+		const parentThis = this;
 		this.uninstallMonkeyPatch = around(WorkspaceLeaf.prototype, {
 			openFile(oldopenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
-					if (parentThis.settings.PDFApp && file.extension == "pdf") {
+					console.log(openState);
+					if (parentThis.settings.PDFApp && file.extension == 'pdf') {
 						// @ts-ignore
 						app.openWithDefaultApp(file.path);
 						return;
 					}
-					let openElsewhere = false;
-					// if clicking on link with same path as active file in view, defer to default behavior (ie headings, blocks, etc). file.path is thing being opened. app.workspace.getActiveFile()?.path is currently opened tab filepath.
-					let sameFile =
-						file.path == app.workspace.getActiveFile()?.path;
-					if (sameFile) {
-						oldopenFile &&
-							oldopenFile.apply(this, [file, openState]);
-						return;
-					} else if (parentThis.settings.newTab && !sameFile) {
-						// else if already open in another tab, switch to that tab
-						app.workspace.iterateAllLeaves(
-							(leaf: WorkspaceLeaf) => {
-								const viewState = leaf.getViewState();
-								const matchesMarkdownFile =
-									viewState.type === "markdown" &&
-									viewState.state?.file?.endsWith(
-										`${file.basename}.md`
-									);
-								const matchesNonMarkdownFile =
-									viewState.type !== "markdown" &&
-									viewState.state.file === file.name;
-								// viewState.state?.file?.endsWith(file.basename);
 
-								if (
-									matchesMarkdownFile ||
-									matchesNonMarkdownFile
-								) {
-									app.workspace.setActiveLeaf(leaf, {
-										focus: true,
-									});
-									// console.log("openElsewhere");
-									openElsewhere = true;
-									return;
-								}
+					// if clicking on link with same path as active file in view, defer to default behavior (ie headings, blocks, etc). file.path is thing being opened. app.workspace.getActiveFile()?.path is currently opened tab filepath.
+					let openElsewhere = false;
+					const sameFile = file.path == app.workspace.getActiveFile()?.path;
+
+					if (sameFile) {
+						oldopenFile && oldopenFile.apply(this, [file, openState]);
+						return;
+					}
+
+					else if (parentThis.settings.newTab && !sameFile) {
+
+						// else if already open in another tab, switch to that tab
+						app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
+							if (leaf.getViewState().state?.file == file.name) {
+								app.workspace.setActiveLeaf(leaf, {
+									focus: true,
+								});
+								openElsewhere = true;
+								return;
 							}
-						);
+						});
+
 						// else open in new tab
 
 						//default behavior but new tab
-						if (
-							parentThis.settings.newTab &&
-							!sameFile &&
-							!openElsewhere
-						) {
-							// console.log("default behavior but new tab");
-							oldopenFile &&
-								oldopenFile.apply(
-									this.app.workspace.getLeaf("tab"),
-									[file, openState]
-								);
-							return;
+						if (!openElsewhere && parentThis.settings.newTab && !sameFile) {
+
+							// if there's already an empty leaf, pick that one
+
+							const emptyLeaves = app.workspace.getLeavesOfType('empty');
+							// console.log(emptyLeaves.length);
+							//TODO will this fuck up if mult distinct windows tho
+							if (emptyLeaves.length > 0) {
+								oldopenFile &&
+								oldopenFile.apply(emptyLeaves[0], [file, openState]);
+								return;
+							}
+							else {
+								oldopenFile &&
+									oldopenFile.apply(this.app.workspace.getLeaf('tab'), [
+										file,
+										openState,
+									]);
+								return;
+							}
 						}
 					}
+
 					// default behavior
-					if (!parentThis.settings.newTab) {
-						oldopenFile &&
-							oldopenFile.apply(this, [file, openState]);
+					else if (!parentThis.settings.newTab) {
+						oldopenFile && oldopenFile.apply(this, [file, openState]);
 						return;
 					}
 				};
@@ -127,28 +122,44 @@ export default class Opener extends Plugin {
 	}
 
 	// fixes editor:open-link-in-new-leaf, context menu > open in new tab, etc, command palette "open link under cursor in new tab"
-	monkeyPatchopenLinkText() {
-		let parentThis = this;
-		this.uninstallMonkeyPatch = around(Workspace.prototype, {
-			openLinkText(oldOpenLinkText) {
-				return async function (
-					linkText: string,
-					sourcePath: string,
-					newLeaf?: boolean,
-					openViewState?: OpenViewState
-				) {
-					if (parentThis.settings.newTab) {
-						newLeaf = false;
-					}
-					oldOpenLinkText &&
-						oldOpenLinkText.apply(this, [
-							linkText,
-							sourcePath,
-							newLeaf,
-							openViewState,
-						]);
-				};
-			},
-		});
-	}
+	// monkeyPatchopenLinkText() {
+	// 	let parentThis = this;
+	// 	this.uninstallMonkeyPatch = around(Workspace.prototype, {
+	// 		openLinkText(oldOpenLinkText) {
+	// 			return async function (
+	// 				linkText: string,
+	// 				sourcePath: string,
+	// 				newLeaf?: PaneType | boolean,
+	// 				openViewState?: OpenViewState
+	// 			) {
+	// 				//app.workspace.detachLeavesOfType('empty');
+	// 				console.log(newLeaf);
+	// 				// PaneType: 'split' if to the right, true if new tab. this thing isn't catching window, openFile is.
+	// 				if (parentThis.settings.newTab) {
+	// 					if (newLeaf == "split") {
+	// 						// this.app.workspace.getLeaf("split");
+	// 						// // this.app.workspace.setActiveLeaf(
+	// 						// // 	this.app.workspace.getRightLeaf(true)
+	// 						// // );
+	// 						// // WorkspaceLeaf.prototype.openFile()
+	// 						// this.app.workspace
+	// 						// 	.getRightLeaf(true)
+	// 						// 	.prototype.openFile("");
+	// 						// return;
+	// 						// 	instead of this path, I should just mod other monkeypath to use existing empty leaves, if they exist
+	// 					} else if (newLeaf == true) {
+	// 						// newLeaf = false;
+	// 					}
+	// 				}
+	// 				oldOpenLinkText &&
+	// 					oldOpenLinkText.apply(this, [
+	// 						linkText,
+	// 						sourcePath,
+	// 						newLeaf,
+	// 						openViewState,
+	// 					]);
+	// 			};
+	// 		},
+	// 	});
+	// }
 }
