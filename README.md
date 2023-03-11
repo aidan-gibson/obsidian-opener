@@ -1,7 +1,8 @@
 
 obsidian-opener:
-* opens pdfs with default app
-* opens md in new tabs (unless tab already exists, then switches to that tab)
+* opens md in new tabs (unless tab already exists, then switches to that tab).
+* opens pdfs ([or other filetypes obsidian can open](https://help.obsidian.md/Advanced+topics/Accepted+file+formats)) with default app instead.
+
 
 
 
@@ -26,12 +27,10 @@ npm run build
 - [ ] test mobile
   - if works, update manifest.json 'isDesktopOnly'
 - [ ] add to community plugins
+- [ ] add blank field to settings for custom extensions idk
+  - also beautify the settings page
 - [ ] html viewer plugin
 - [ ] graph view doesn't open in new tab
 - when clicking [[sample.pptx]], power point opened in focus, but a new tab opened in obsid
 # Notes
 If there is a tab open in another Obsidian window which is minimized, it will look like nothing is happening. I don't have the ability to unminimize the other window as an Obsidian plug-in (afaik).
-
-# notes to self
-obsidian not only supports opening pdfs natively, but also 
-https://help.obsidian.md/Advanced+topics/Accepted+file+formats
