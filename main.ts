@@ -44,10 +44,10 @@ export default class Opener extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		// this.monkeyPatchopenFile();
 	}
 
 	monkeyPatchopenFile() {
-		// console.log(this.settings.PDFApp);
 		let parentThis = this;
 		this.uninstallMonkeyPatch = around(WorkspaceLeaf.prototype, {
 			openFile(oldopenFile) {
@@ -65,7 +65,7 @@ export default class Opener extends Plugin {
 						oldopenFile &&
 							oldopenFile.apply(this, [file, openState]);
 						return;
-					} else if (!sameFile) {
+					} else if (parentThis.settings.newTab && !sameFile) {
 						// else if already open in another tab, switch to that tab
 						app.workspace.iterateAllLeaves(
 							(leaf: WorkspaceLeaf) => {
@@ -96,7 +96,11 @@ export default class Opener extends Plugin {
 						// else open in new tab
 
 						//default behavior but new tab
-						if (!sameFile && !openElsewhere) {
+						if (
+							parentThis.settings.newTab &&
+							!sameFile &&
+							!openElsewhere
+						) {
 							// console.log("default behavior but new tab");
 							oldopenFile &&
 								oldopenFile.apply(
@@ -105,6 +109,15 @@ export default class Opener extends Plugin {
 								);
 							return;
 						}
+					}
+					// default behavior
+					if (
+						!parentThis.settings.newTab &&
+						!parentThis.settings.PDFApp
+					) {
+						oldopenFile &&
+							oldopenFile.apply(this, [file, openState]);
+						return;
 					}
 				};
 			},

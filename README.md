@@ -24,14 +24,16 @@ npm run build
 
 # ToDo:
 - [ ] settings (Toggle openpdf and open newtab on/off for ppl who just want one of the features).
-  - if open PDFApp == false; make sure it still opens in new tab
+- [ ] move ts files into src
 - [ ] test mobile
+  - if works, update manifest.json 'isDesktopOnly'
 - [ ] test with common plugins etc
 - [ ] add to community plugins
 - [ ] html viewer plugin
 opening graph view ruins
 - [ ] if existing tab in minimized obsid window, the tab is still selected within that window but the window doesn't unminimize
 - if middle click or right click > open in new tab or QuickSwitcher++ cmd+enter, a new empty tab is opened
+- what if someone wants to open an existing tab in new window? current implementation won't let them. add option to treat windows as siloed (only look for existing tabs in current window), so ya can open a tab that exists in another window in a new window
 # Notes on Other Plugins
 * QuickSwitcher++
   * Turn off "Default to open in new tab"; else you will get extra empty tabs

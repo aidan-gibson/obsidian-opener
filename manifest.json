@@ -6,5 +6,5 @@
 	"description": "Opens pdf in default app and open md in new tabs",
 	"author": "Aidan Gibson",
 	"authorUrl": "https://github.com/aidan-gibson",
-	"isDesktopOnly": false
+	"isDesktopOnly": true
 }
