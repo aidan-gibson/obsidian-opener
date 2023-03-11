@@ -85,7 +85,7 @@ export default class Opener extends Plugin {
 
 						// else open in new tab
 
-						//default behavior but new tab
+
 						if (!openElsewhere && parentThis.settings.newTab && !sameFile) {
 
 							// if there's already an empty leaf, pick that one
