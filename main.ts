@@ -23,15 +23,10 @@ export default class Opener extends Plugin {
 	async onload() {
 		console.log('loading ' + this.manifest.name + ' plugin');
 		await this.loadSettings();
-		// this.migrateSettings();
+
 		this.addSettingTab(new OpenerSettingTab(this.app, this));
 		this.monkeyPatchopenFile();
 		this.monkeyPatchopenLinkText();
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		// (this.app as any).commands.removeCommand(
-		// 	`editor:open-link-in-new-leaf`
-		// );
-		// (this.app as any).commands.addCommand(`editor:open-link-in-new-leaf`);
 	}
 
 	onunload(): void {
@@ -56,8 +51,8 @@ export default class Opener extends Plugin {
 		this.uninstallMonkeyPatch = around(WorkspaceLeaf.prototype, {
 			openFile(oldopenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
-
-					if (parentThis.settings.PDFApp && file.extension == 'pdf') {
+					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg','3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
+					if ((parentThis.settings.PDFApp && file.extension == 'pdf') || (parentThis.settings.allExt && ALLEXT.includes(file.extension))) {
 						// @ts-ignore
 						app.openWithDefaultApp(file.path);
 						return;
@@ -144,44 +139,5 @@ export default class Opener extends Plugin {
 			},
 		});
 	}
-	// monkeyPatchopenLinkText() {
-	// 	let parentThis = this;
-	// 	this.uninstallMonkeyPatch = around(Workspace.prototype, {
-	// 		openLinkText(oldOpenLinkText) {
-	// 			return async function (
-	// 				linkText: string,
-	// 				sourcePath: string,
-	// 				newLeaf?: PaneType | boolean,
-	// 				openViewState?: OpenViewState
-	// 			) {
-	// 				//app.workspace.detachLeavesOfType('empty');
-	// 				console.log(newLeaf);
-	// 				// PaneType: 'split' if to the right, true if new tab. this thing isn't catching window, openFile is.
-	// 				if (parentThis.settings.newTab) {
-	// 					if (newLeaf == "split") {
-	// 						// this.app.workspace.getLeaf("split");
-	// 						// // this.app.workspace.setActiveLeaf(
-	// 						// // 	this.app.workspace.getRightLeaf(true)
-	// 						// // );
-	// 						// // WorkspaceLeaf.prototype.openFile()
-	// 						// this.app.workspace
-	// 						// 	.getRightLeaf(true)
-	// 						// 	.prototype.openFile("");
-	// 						// return;
-	// 						// 	instead of this path, I should just mod other monkeypath to use existing empty leaves, if they exist
-	// 					} else if (newLeaf == true) {
-	// 						// newLeaf = false;
-	// 					}
-	// 				}
-	// 				oldOpenLinkText &&
-	// 					oldOpenLinkText.apply(this, [
-	// 						linkText,
-	// 						sourcePath,
-	// 						newLeaf,
-	// 						openViewState,
-	// 					]);
-	// 			};
-	// 		},
-	// 	});
-	// }
+
 }

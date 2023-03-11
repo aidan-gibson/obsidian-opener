@@ -28,8 +28,10 @@ npm run build
 - [ ] add to community plugins
 - [ ] html viewer plugin
 - [ ] graph view doesn't open in new tab
+- when clicking [[sample.pptx]], power point opened in focus, but a new tab opened in obsid
 # Notes
 If there is a tab open in another Obsidian window which is minimized, it will look like nothing is happening. I don't have the ability to unminimize the other window as an Obsidian plug-in (afaik).
 
 # notes to self
-obsidian not only supports pdfs, but also 
+obsidian not only supports opening pdfs natively, but also 
+https://help.obsidian.md/Advanced+topics/Accepted+file+formats
