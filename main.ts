@@ -25,6 +25,11 @@ export default class Opener extends Plugin {
 		// this.migrateSettings();
 		this.addSettingTab(new OpenerSettingTab(this.app, this));
 		this.monkeyPatchopenFile();
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// (this.app as any).commands.removeCommand(
+		// 	`editor:open-link-in-new-leaf`
+		// );
+		// (this.app as any).commands.addCommand(`editor:open-link-in-new-leaf`);
 	}
 
 	onunload(): void {

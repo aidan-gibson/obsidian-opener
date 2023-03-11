@@ -23,7 +23,6 @@ npm run build
 ```
 
 # ToDo:
-- [ ] settings (Toggle openpdf and open newtab on/off for ppl who just want one of the features).
 - [ ] move ts files into src
 - [ ] test mobile
   - if works, update manifest.json 'isDesktopOnly'
