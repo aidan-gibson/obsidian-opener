@@ -23,16 +23,13 @@ npm run build
 ```
 
 # ToDo:
-
-- [ ] header (and presumably block links etc) don't take u to correct place if coming from another page
-
-- create note to the right
 - [ ] test mobile
   - if works, update manifest.json 'isDesktopOnly'
 - [ ] add to community plugins
 - [ ] html viewer plugin
-opening graph view ruins
-## Known issues
-* graph view doesn't open in new tab
+- [ ] graph view doesn't open in new tab
 # Notes
 If there is a tab open in another Obsidian window which is minimized, it will look like nothing is happening. I don't have the ability to unminimize the other window as an Obsidian plug-in (afaik).
+
+# notes to self
+obsidian not only supports pdfs, but also 

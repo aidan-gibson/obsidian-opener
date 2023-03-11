@@ -56,7 +56,7 @@ export default class Opener extends Plugin {
 		this.uninstallMonkeyPatch = around(WorkspaceLeaf.prototype, {
 			openFile(oldopenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
-					// console.log(openState);
+
 					if (parentThis.settings.PDFApp && file.extension == 'pdf') {
 						// @ts-ignore
 						app.openWithDefaultApp(file.path);
