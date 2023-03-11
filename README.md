@@ -33,9 +33,13 @@ npm run build
 - [ ] add to community plugins
 - [ ] html viewer plugin
 opening graph view ruins
-- [ ] if existing tab in minimized obsid window, the tab is still selected within that window but the window doesn't unminimize
+
 - if middle click or right click > open in new tab or QuickSwitcher++ cmd+enter, a new empty tab is opened
 - what if someone wants to open an existing tab in new window? current implementation won't let them. add option to treat windows as siloed (only look for existing tabs in current window), so ya can open a tab that exists in another window in a new window
+
+# Notes
+If there is a tab open in another Obsidian window which is minimized, it will look like nothing is happening. I don't have the ability to unminimize the other window as an Obsidian plug-in (afaik).
+
 # Notes on Other Plugins
 * QuickSwitcher++
   * Turn off "Default to open in new tab"; else you will get extra empty tabs

@@ -91,14 +91,12 @@ export default class Opener extends Plugin {
 							// if there's already an empty leaf, pick that one
 
 							const emptyLeaves = app.workspace.getLeavesOfType('empty');
-							// console.log(emptyLeaves.length);
-							//TODO will this fuck up if mult distinct windows tho
 							if (emptyLeaves.length > 0) {
 								oldopenFile &&
 								oldopenFile.apply(emptyLeaves[0], [file, openState]);
 								return;
 							}
-							else {
+							else if (emptyLeaves.length <= 0) {
 								oldopenFile &&
 									oldopenFile.apply(this.app.workspace.getLeaf('tab'), [
 										file,
