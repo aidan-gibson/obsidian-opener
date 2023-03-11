@@ -52,7 +52,7 @@ export default class Opener extends Plugin {
 			openFile(oldopenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
 					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg','3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
-					if ((parentThis.settings.PDFApp && file.extension == 'pdf') || (parentThis.settings.allExt && ALLEXT.includes(file.extension))) {
+					if ((parentThis.settings.PDFApp && file.extension == 'pdf') || (parentThis.settings.allExt && ALLEXT.includes(file.extension)) || (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension))) {
 						// @ts-ignore
 						app.openWithDefaultApp(file.path);
 						return;

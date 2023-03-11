@@ -31,7 +31,7 @@ export class OpenerSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Open everything outside of Obsidian")
 			.setDesc(
-				"Enable to open all obsidian supported extensions with system viewer instead. Disable for default behavior (open within Obsidian)."
+				"Enable to open all obsidian supported extensions with system viewer instead. Disable for default behavior (open within Obsidian). Defaults supported extensions are 'png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg','3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'."
 			)
 			.addToggle((toggle) =>
 				toggle.setValue(plugin.settings.allExt).onChange((value) => {
@@ -39,5 +39,25 @@ export class OpenerSettingTab extends PluginSettingTab {
 					plugin.saveSettings();
 				})
 			);
+		new Setting(containerEl)
+			.setName("Custom Extensions")
+			.setDesc("This shouldn't be necessary, but you can manually enable custom extensions here.")
+			.addToggle((toggle) =>
+				toggle.setValue(plugin.settings.custExt).onChange((value) => {
+					plugin.settings.custExt = value;
+					plugin.saveSettings();
+				})
+			);
+		new Setting(containerEl)
+			.setName("Custom Extensions List")
+			.setDesc("Enter extension names (without the dot, ie, just docx separated by newlines.")
+			.addTextArea((textArea) => {
+          textArea
+              .setValue(plugin.settings.custExtList.join('\n'))
+              .onChange(async (value) => {
+                plugin.settings.custExtList = value.split('\n');
+                plugin.saveSettings();
+              });
+        });
 	}
 }
