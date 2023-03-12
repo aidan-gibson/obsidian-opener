@@ -15,7 +15,6 @@ import { around } from 'monkey-around';
 import { OpenerSettingTab } from './settings';
 import { DEFAULT_SETTINGS } from './constants';
 import { OpenerSetting } from './types';
-import { commands } from 'codemirror';
 
 export default class Opener extends Plugin {
 	settings: OpenerSetting;
@@ -98,11 +97,12 @@ export default class Opener extends Plugin {
 								console.log('bruv');
 								oldopenFile && oldopenFile.apply(leaf, [file, openState]);
 								openElsewhere = true;
-								console.log(openElsewhere);
-								return;
+								console.log("openElsewhere: ",openElsewhere);
+								// return;
 							}
 						});
-						// console.log(openElsewhere);
+
+
 						// else open in new tab
 
 
@@ -113,7 +113,8 @@ export default class Opener extends Plugin {
 							const emptyLeaves = app.workspace.getLeavesOfType('empty');
 							console.log("emptyLeaves: ", emptyLeaves.length);
 							if (emptyLeaves.length > 0) {
-								console.log("emptyLeaves.length > 0")
+								console.log("emptyLeaves.length > 0");
+								console.log(emptyLeaves[0]);
 								oldopenFile &&
 								oldopenFile.apply(emptyLeaves[0], [file, openState]);
 								return;
@@ -152,6 +153,7 @@ export default class Opener extends Plugin {
 					newLeaf?: PaneType | boolean,
 					openViewState?: OpenViewState
 				) {
+					console.log("openLinkText")
 					console.log(newLeaf);
 					console.log(openViewState);
 					if(newLeaf == 'tab' || newLeaf == true){

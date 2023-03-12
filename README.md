@@ -28,7 +28,8 @@ npm run build
 if it's already open, don't open it in new tab.
 but if it's in canvas & selected it THINKS its open.
 
-fixed it partially; if note already open in another tab it'll now switch to it proper but open a new tab
+fixed it partially; if note already open in another tab it'll now switch to it proper but open a new tab. 
+also if there's an empty tab available it won't pick it.
 # ToDo:
 - [ ] test mobile
 - [ ] add basic gif to readme showing what plugin does
@@ -37,6 +38,7 @@ fixed it partially; if note already open in another tab it'll now switch to it p
 - [ ] beautify the settings page
 - [ ] Issue: `open link under cursor in new window` with file already open opens new window with newtab page. Desired behavior: don't open new window if already open.
   - `app.workspace.getLeaf('window');` opens window
+  - `app.workspace.openPopoutLeaf();` this one
 
 # Notes
 * Graph view command doesn't open in new tab, it doesn't use `openFile()`. I have provided command 'Open Graph View in new tab' you can reassign Ctrl/Cmd + G to.
