@@ -64,7 +64,8 @@ export default class Opener extends Plugin {
 		this.uninstallMonkeyPatch = around(WorkspaceLeaf.prototype, {
 			openFile(oldopenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
-					// console.log("new open file");
+					console.log("new open file");
+					console.log(TFile);
 					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg','3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
 					const OBSID_OPENABLE = ALLEXT.concat(['md','canvas','pdf']);
 					// console.log("open file run")
