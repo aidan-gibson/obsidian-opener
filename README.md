@@ -27,6 +27,8 @@ npm run build
 ```
 if it's already open, don't open it in new tab.
 but if it's in canvas & selected it THINKS its open.
+
+fixed it partially; if note already open in another tab it'll now switch to it proper but open a new tab
 # ToDo:
 - [ ] test mobile
 - [ ] add basic gif to readme showing what plugin does
