@@ -50,7 +50,7 @@ export class OpenerSettingTab extends PluginSettingTab {
 			);
 		new Setting(containerEl)
 			.setName("Custom Extensions List")
-			.setDesc("Enter extension names (without the dot, ie, just docx separated by newlines.")
+			.setDesc("Enter extension names (without the dot, ie, just docx separated by newlines).")
 			.addTextArea((textArea) => {
           textArea
               .setValue(plugin.settings.custExtList.join('\n'))

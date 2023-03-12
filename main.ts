@@ -9,12 +9,13 @@ import {
 	TFile,
 	PluginSettingTab,
 	Setting,
-	PaneType,
+	PaneType, Editor
 } from 'obsidian';
 import { around } from 'monkey-around';
 import { OpenerSettingTab } from './settings';
 import { DEFAULT_SETTINGS } from './constants';
 import { OpenerSetting } from './types';
+import { commands } from 'codemirror';
 
 export default class Opener extends Plugin {
 	settings: OpenerSetting;
@@ -27,6 +28,19 @@ export default class Opener extends Plugin {
 		this.addSettingTab(new OpenerSettingTab(this.app, this));
 		this.monkeyPatchopenFile();
 		this.monkeyPatchopenLinkText();
+		this.addCommand({
+      id: "open-graph-view-in-new-tab",
+      name: "Open Graph View in new tab",
+      callback: () => {
+			// @ts-ignore
+      this.app.commands.executeCommandById("workspace:new-tab");
+			// @ts-ignore
+			this.app.commands.executeCommandById("graph:open");
+      },
+    });
+	}
+	async newtabGV() {
+		this.app
 	}
 
 	onunload(): void {
@@ -45,6 +59,7 @@ export default class Opener extends Plugin {
 	}
 
 	monkeyPatchopenFile() {
+
 		// TODO
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const parentThis = this;
@@ -52,6 +67,7 @@ export default class Opener extends Plugin {
 			openFile(oldopenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
 					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg','3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
+					// console.log("open file run")
 					if ((parentThis.settings.PDFApp && file.extension == 'pdf') || (parentThis.settings.allExt && ALLEXT.includes(file.extension)) || (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension))) {
 						// @ts-ignore
 						app.openWithDefaultApp(file.path);
