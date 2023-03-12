@@ -25,7 +25,8 @@ git clone https://github.com/aidan-gibson/obsidian-opener
 npm install
 npm run build
 ```
-
+if it's already open, don't open it in new tab.
+but if it's in canvas & selected it THINKS its open.
 # ToDo:
 - [ ] test mobile
 - [ ] add basic gif to readme showing what plugin does
