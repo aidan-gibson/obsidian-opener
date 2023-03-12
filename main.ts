@@ -143,11 +143,17 @@ export default class Opener extends Plugin {
 					newLeaf?: PaneType | boolean,
 					openViewState?: OpenViewState
 				) {
-					// console.log(newLeaf);
-					// console.log(openViewState);
-					if(newLeaf == 'tab'){
+					console.log(newLeaf);
+					console.log(openViewState);
+					if(newLeaf == 'tab' || newLeaf == true){
 						newLeaf = false;
 					}
+					else{
+					app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
+							if (leaf.getViewState().state?.file == (sourcePath)) {
+								newLeaf = false;
+							}
+						})}
 					oldOpenLinkText &&
 						oldOpenLinkText.apply(this, [
 							linkText,
