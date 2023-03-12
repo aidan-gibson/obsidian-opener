@@ -11,3 +11,9 @@ set positional-arguments
 @c bar:
   git commit -am "$1"
   git push
+
+# build (other plugins won't need the app reboot, but ones with monkeypatch should
+@b:
+  npm run build
+  osascript -e 'quit app "Obsidian"'
+  open -a Obsidian
