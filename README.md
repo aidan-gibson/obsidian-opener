@@ -31,6 +31,8 @@ npm run build
   - if works, update manifest.json 'isDesktopOnly'
 - [ ] add to community plugins
 - [ ] beautify the settings page
+- [ ] open link under cursor in new tab/window/to the right
+  - opens newtab if link already open somewhere
 
 # Notes
 * Graph view command doesn't open in new tab, it doesn't use `openFile()`. I have provided command 'Open Graph View in new tab' you can reassign Ctrl/Cmd + G to.
