@@ -95,6 +95,7 @@ export default class Opener extends Plugin {
 							// if (leaf.getViewState().state?.file?.endsWith(file.name)) { //this works. but also:
 							if (leaf.getViewState().state?.file == (file.path) && leaf.getViewState().type != 'canvas') {
 								console.log(leaf.getViewState().state?.file);
+								console.log('bruv');
 								oldopenFile && oldopenFile.apply(leaf, [file, openState]);
 								openElsewhere = true;
 								console.log(openElsewhere);
