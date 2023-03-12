@@ -31,9 +31,7 @@ npm run build
   - if works, update manifest.json 'isDesktopOnly'
 - [ ] add to community plugins
 - [ ] beautify the settings page
-- when clicking [[sample.pptx]], power point opened in focus, but a new tab opened in obsid
-  - if ext can't b opened with obsidian, it shouldn't hit line 103
-    - can't b opened with obsidian = not on ALLEXT, || yes on parentThis.settings.custExtList
+
 # Notes
 * Graph view command doesn't open in new tab, it doesn't use `openFile()`. I have provided command 'Open Graph View in new tab' you can reassign Ctrl/Cmd + G to.
 * If there is a tab open in another Obsidian window which is minimized, it will look like nothing is happening. I don't have the ability to unminimize the other window as an Obsidian plug-in (afaik).
