@@ -27,9 +27,8 @@ npm run build
 - [ ] test mobile
   - if works, update manifest.json 'isDesktopOnly'
 - [ ] add to community plugins
-- [ ] add blank field to settings for custom extensions idk
-  - also beautify the settings page
-- [ ] html viewer plugin
+- [ ] beautify the settings page
+- [ ] html viewer plugin cooperation test
 - [ ] graph view doesn't open in new tab
 - when clicking [[sample.pptx]], power point opened in focus, but a new tab opened in obsid
 # Notes
