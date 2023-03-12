@@ -28,11 +28,12 @@ npm run build
 
 # ToDo:
 - [ ] test mobile
+- [ ] add basic gif to readme showing what plugin does
   - if works, update manifest.json 'isDesktopOnly'
 - [ ] add to community plugins
 - [ ] beautify the settings page
-- [ ] open link under cursor in new tab/window/to the right
-  - opens newtab if link already open somewhere
+- [ ] Issue: `open link under cursor in new window` with file already open opens new window with newtab page. Desired behavior: don't open new window if already open.
+  - `app.workspace.getLeaf('window');` opens window
 
 # Notes
 * Graph view command doesn't open in new tab, it doesn't use `openFile()`. I have provided command 'Open Graph View in new tab' you can reassign Ctrl/Cmd + G to.
