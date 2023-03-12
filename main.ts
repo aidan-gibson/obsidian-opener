@@ -39,9 +39,7 @@ export default class Opener extends Plugin {
       },
     });
 	}
-	async newtabGV() {
-		this.app
-	}
+
 
 	onunload(): void {
 		this.uninstallMonkeyPatch && this.uninstallMonkeyPatch();
@@ -66,9 +64,11 @@ export default class Opener extends Plugin {
 		this.uninstallMonkeyPatch = around(WorkspaceLeaf.prototype, {
 			openFile(oldopenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
+					// console.log("new open file");
 					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg','3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
+					const OBSID_OPENABLE = ALLEXT.concat(['md','canvas','pdf']);
 					// console.log("open file run")
-					if ((parentThis.settings.PDFApp && file.extension == 'pdf') || (parentThis.settings.allExt && ALLEXT.includes(file.extension)) || (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension))) {
+					if ((parentThis.settings.PDFApp && file.extension == 'pdf') || (parentThis.settings.allExt && ALLEXT.includes(file.extension)) || (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension))|| (!OBSID_OPENABLE.includes(file.extension) && (!parentThis.settings.custExtIn ||(parentThis.settings.custExtIn && !parentThis.settings.custExtInList.includes(file.extension))))) {
 						// @ts-ignore
 						app.openWithDefaultApp(file.path);
 						return;
