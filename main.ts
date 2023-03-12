@@ -71,13 +71,17 @@ export default class Opener extends Plugin {
 
 						// else if already open in another tab, switch to that tab
 						app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
-							if (leaf.getViewState().state?.file == file.name) {
+							// if (leaf.getViewState().state?.file == file.name) {
+							// leaf.getViewState().state?.file = 'Folder/folder note.md' (if it's within a folder). this will not match with file.name
+							// console.log(file.path);
+							// if (leaf.getViewState().state?.file?.endsWith(file.name)) { //this works. but also:
+							if (leaf.getViewState().state?.file == (file.path)) {
 								oldopenFile && oldopenFile.apply(leaf, [file, openState]);
 								openElsewhere = true;
 								return;
 							}
 						});
-
+						// console.log(openElsewhere);
 						// else open in new tab
 
 
@@ -123,8 +127,8 @@ export default class Opener extends Plugin {
 					newLeaf?: PaneType | boolean,
 					openViewState?: OpenViewState
 				) {
-					console.log(newLeaf);
-					console.log(openViewState);
+					// console.log(newLeaf);
+					// console.log(openViewState);
 					if(newLeaf == 'tab'){
 						newLeaf = false;
 					}

@@ -9,10 +9,13 @@ obsidian-opener:
 Lots of partial implementations of this exist (ie, QuickSwitcher++ can open new tabs by default&switch to existing tab if it exists...but it does nothing for clicking on an internal link within a note). This is a comprehensive solution that works by modifying Obsidian's built-in `openFile()` function (which is the function QuickSwitcher++ and Obsidian QuickSwitcher use under the hood.) So this should be compatible with all existing plugins out of the box, no matter how you're opening new files (from search results, Omnisearch, backlinks, etc). 
  
 
-# Install
+# Installation
 ## Recommended
 1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat) conventionally.
 2. Use BRAT to install via this link https://github.com/aidan-gibson/obsidian-opener
+3. Enable the plugin in settings.
+
+I recommend enabling "Auto-Update Plugins at Startup" in BRAT settings. Obsidian may release breaking changes to this plugin at any time, staying up to date is very important. I actually install all my plugins via BRAT for ease of auto-update anyway, manually updating in Obsidian is a drag. 
 
 ## Source
 Build from source via:

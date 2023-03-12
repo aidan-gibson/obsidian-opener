@@ -16,4 +16,5 @@ set positional-arguments
 @b:
   npm run build
   osascript -e 'quit app "Obsidian"'
+  sleep 2
   open -a Obsidian
