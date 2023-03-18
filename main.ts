@@ -63,14 +63,14 @@ export default class Opener extends Plugin {
 		this.uninstallMonkeyPatch = around(WorkspaceLeaf.prototype, {
 			openFile(oldopenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
-					console.log("new open file");
+					// console.log("new open file");
 					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg','3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
 					const OBSID_OPENABLE = ALLEXT.concat(['md','canvas','pdf']);
 					// console.log("open file run")
 					if ((parentThis.settings.PDFApp && file.extension == 'pdf') || (parentThis.settings.allExt && ALLEXT.includes(file.extension)) || (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension))|| (!OBSID_OPENABLE.includes(file.extension) && (!parentThis.settings.custExtIn ||(parentThis.settings.custExtIn && !parentThis.settings.custExtInList.includes(file.extension))))) {
 						// @ts-ignore
 						app.openWithDefaultApp(file.path);
-						console.log("open w default");
+						// console.log("open w default");
 						return;
 					}
 
@@ -79,13 +79,13 @@ export default class Opener extends Plugin {
 					const sameFile = file.path == app.workspace.getActiveFile()?.path;
 
 					if (sameFile) {
-						console.log("same file");
+						// console.log("same file");
 						oldopenFile && oldopenFile.apply(this, [file, openState]);
 						return;
 					}
 
 					else if (parentThis.settings.newTab && !sameFile) {
-						console.log("not same file");
+						// console.log("not same file");
 						// else if already open in another tab, switch to that tab
 						app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
 							// if (leaf.getViewState().state?.file == file.name) {
@@ -93,11 +93,11 @@ export default class Opener extends Plugin {
 							// console.log(file.path);
 							// if (leaf.getViewState().state?.file?.endsWith(file.name)) { //this works. but also:
 							if (leaf.getViewState().state?.file == (file.path) && leaf.getViewState().type != 'canvas') {
-								console.log(leaf.getViewState().state?.file);
-								console.log('bruv');
+								// console.log(leaf.getViewState().state?.file);
+								// console.log('bruv');
 								oldopenFile && oldopenFile.apply(leaf, [file, openState]);
 								openElsewhere = true;
-								console.log("openElsewhere: ",openElsewhere);
+								// console.log("openElsewhere: ",openElsewhere);
 								// return;
 							}
 						});
@@ -111,16 +111,16 @@ export default class Opener extends Plugin {
 							// if there's already an empty leaf, pick that one
 
 							const emptyLeaves = app.workspace.getLeavesOfType('empty');
-							console.log("emptyLeaves: ", emptyLeaves.length);
+							// console.log("emptyLeaves: ", emptyLeaves.length);
 							if (emptyLeaves.length > 0) {
-								console.log("emptyLeaves.length > 0");
-								console.log(emptyLeaves[0]);
+								// console.log("emptyLeaves.length > 0");
+								// console.log(emptyLeaves[0]);
 								oldopenFile &&
 								oldopenFile.apply(emptyLeaves[0], [file, openState]);
 								return;
 							}
 							else if (emptyLeaves.length <= 0) {
-								console.log("emptyLeaves.length <= 0");
+								// console.log("emptyLeaves.length <= 0");
 								oldopenFile &&
 									oldopenFile.apply(this.app.workspace.getLeaf('tab'), [
 										file,
@@ -133,7 +133,7 @@ export default class Opener extends Plugin {
 
 					// default behavior
 					else if (!parentThis.settings.newTab) {
-						console.log("default");
+						// console.log("default");
 						oldopenFile && oldopenFile.apply(this, [file, openState]);
 						return;
 					}
@@ -153,9 +153,9 @@ export default class Opener extends Plugin {
 					newLeaf?: PaneType | boolean,
 					openViewState?: OpenViewState
 				) {
-					console.log("openLinkText")
-					console.log(newLeaf);
-					console.log(openViewState);
+					// console.log("openLinkText")
+					// console.log(newLeaf);
+					// console.log(openViewState);
 					if(newLeaf == 'tab' || newLeaf == true){
 						newLeaf = false;
 					}
