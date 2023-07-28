@@ -18,7 +18,8 @@ import { OpenerSetting } from './types';
 
 export default class Opener extends Plugin {
 	settings: OpenerSetting;
-	uninstallMonkeyPatch: () => void;
+	uninstallMonkeyPatchOpenFile: () => void;
+	uninstallMonkeyPatchOpenLinkText: () => void;
 
 	async onload() {
 		console.log('loading ' + this.manifest.name + ' plugin');
@@ -41,7 +42,8 @@ export default class Opener extends Plugin {
 
 
 	onunload(): void {
-		this.uninstallMonkeyPatch && this.uninstallMonkeyPatch();
+		this.uninstallMonkeyPatchOpenFile && this.uninstallMonkeyPatchOpenFile();
+		this.uninstallMonkeyPatchOpenLinkText && this.uninstallMonkeyPatchOpenLinkText();
 		console.log('unloading ' + this.manifest.name + ' plugin');
 	}
 
@@ -60,7 +62,7 @@ export default class Opener extends Plugin {
 		// TODO
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const parentThis = this;
-		this.uninstallMonkeyPatch = around(WorkspaceLeaf.prototype, {
+		this.uninstallMonkeyPatchOpenFile = around(WorkspaceLeaf.prototype, {
 			openFile(oldopenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
 					// console.log("new open file");
@@ -145,7 +147,7 @@ export default class Opener extends Plugin {
 	// if note already exists, monkeyPatchopenFile() does its job and moves to that one. but openLinkText() with options selected for new tab (invoked via Right Click > Open in New Tab or Quick Switcher Cmd+Enter, etc) will still open a new tab.
 	monkeyPatchopenLinkText() {
 		let parentThis = this;
-		this.uninstallMonkeyPatch = around(Workspace.prototype, {
+		this.uninstallMonkeyPatchOpenLinkText = around(Workspace.prototype, {
 			openLinkText(oldOpenLinkText) {
 				return async function (
 					linkText: string,
