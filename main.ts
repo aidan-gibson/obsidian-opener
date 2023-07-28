@@ -95,7 +95,7 @@ export default class Opener extends Plugin {
 					else if (parentThis.settings.newTab && !sameFile) {
 						// console.log("not same file");
 						// else if already open in another tab, switch to that tab
-						app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
+						app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
 							// if (leaf.getViewState().state?.file == file.name) {
 							// leaf.getViewState().state?.file = 'Folder/folder note.md' (if it's within a folder). this will not match with file.name
 							// console.log(file.path);
@@ -168,7 +168,7 @@ export default class Opener extends Plugin {
 						newLeaf = false;
 					}
 					else{
-					app.workspace.iterateAllLeaves((leaf: WorkspaceLeaf) => {
+					app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
 							if (leaf.getViewState().state?.file == (sourcePath)) {
 								newLeaf = false;
 							}
