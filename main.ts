@@ -84,6 +84,12 @@ export default class Opener extends Plugin {
 						return;
 					}
 
+					// if mode is preview, defer to default behavior (eg. hover editor, excalidraw, embeddings, etc) see issue #5
+					else if (openState?.state?.mode === 'preview') {
+						oldopenFile && oldopenFile.apply(this, [file, openState]);
+						return;
+					}
+
 					else if (parentThis.settings.newTab && !sameFile) {
 						// console.log("not same file");
 						// else if already open in another tab, switch to that tab
