@@ -6,6 +6,7 @@ set positional-arguments
 @p bar:
   npm version patch -m "$1"
   git push origin --tags
+  git push
 # commit
 @c bar:
   git commit -am "$1"
