@@ -6,7 +6,7 @@ set positional-arguments
 @p bar:
   npm version patch -m "$1"
   git push origin --tags
-
+# also need to modify manifest.json to reflect version. TODO fig out automating
 # commit
 @c bar:
   git commit -am "$1"
