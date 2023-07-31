@@ -76,18 +76,14 @@ export default class Opener extends Plugin {
 						return;
 					}
 
-					// if clicking on link with same path as active file in view, defer to default behavior (ie headings, blocks, etc). file.path is thing being opened. app.workspace.getActiveFile()?.path is currently opened tab filepath.
+					// defer to default behavior if:
+					// - clicking on link with same path as active file in view (ie headings, blocks, etc). file.path is thing being opened. app.workspace.getActiveFile()?.path is currently opened tab filepath.
+					// - mode is preview (eg. hover editor, excalidraw, embeddings, etc) see issue #5
+					// - tab is linked to another tab (group), see issue #9
 					let openElsewhere = false;
 					const sameFile = file.path == app.workspace.getActiveFile()?.path;
-
-					if (sameFile) {
-						// console.log("same file");
-						oldopenFile && oldopenFile.apply(this, [file, openState]);
-						return;
-					}
-
-					// if mode is preview, defer to default behavior (eg. hover editor, excalidraw, embeddings, etc) see issue #5
-					else if (openState?.state?.mode === 'preview') {
+					const previewMode = openState?.state?.mode === 'preview';
+					if (sameFile || previewMode || this.group) {
 						oldopenFile && oldopenFile.apply(this, [file, openState]);
 						return;
 					}
@@ -161,10 +157,11 @@ export default class Opener extends Plugin {
 					newLeaf?: PaneType | boolean,
 					openViewState?: OpenViewState
 				) {
-					// console.log("openLinkText")
-					// console.log(newLeaf);
-					// console.log(openViewState);
-					if (newLeaf == 'tab' || newLeaf == true) {
+					if (this.activeLeaf?.group) {
+						// if in a group (linked tab)
+						// do nothing (revert to default behavior)
+						// this way ctrl/cmd + click still opens a new tab
+					} else if (newLeaf == 'tab' || newLeaf == true) {
 						newLeaf = false;
 					} else {
 						app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
