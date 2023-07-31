@@ -29,15 +29,15 @@ export default class Opener extends Plugin {
 		this.monkeyPatchopenFile();
 		this.monkeyPatchopenLinkText();
 		this.addCommand({
-      id: "open-graph-view-in-new-tab",
-      name: "Open Graph View in new tab",
-      callback: () => {
-			// @ts-ignore
-      this.app.commands.executeCommandById("workspace:new-tab");
-			// @ts-ignore
-			this.app.commands.executeCommandById("graph:open");
-      },
-    });
+			id: "open-graph-view-in-new-tab",
+			name: "Open Graph View in new tab",
+			callback: () => {
+				// @ts-ignore
+				this.app.commands.executeCommandById("workspace:new-tab");
+				// @ts-ignore
+				this.app.commands.executeCommandById("graph:open");
+			},
+		});
 	}
 
 
@@ -66,10 +66,10 @@ export default class Opener extends Plugin {
 			openFile(oldopenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
 					// console.log("new open file");
-					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg','3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
-					const OBSID_OPENABLE = ALLEXT.concat(['md','canvas','pdf']);
+					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg', '3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
+					const OBSID_OPENABLE = ALLEXT.concat(['md', 'canvas', 'pdf']);
 					// console.log("open file run")
-					if ((parentThis.settings.PDFApp && file.extension == 'pdf') || (parentThis.settings.allExt && ALLEXT.includes(file.extension)) || (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension))|| (!OBSID_OPENABLE.includes(file.extension) && (!parentThis.settings.custExtIn ||(parentThis.settings.custExtIn && !parentThis.settings.custExtInList.includes(file.extension))))) {
+					if ((parentThis.settings.PDFApp && file.extension == 'pdf') || (parentThis.settings.allExt && ALLEXT.includes(file.extension)) || (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension)) || (!OBSID_OPENABLE.includes(file.extension) && (!parentThis.settings.custExtIn || (parentThis.settings.custExtIn && !parentThis.settings.custExtInList.includes(file.extension))))) {
 						// @ts-ignore
 						app.openWithDefaultApp(file.path);
 						// console.log("open w default");
@@ -124,7 +124,7 @@ export default class Opener extends Plugin {
 								// console.log("emptyLeaves.length > 0");
 								// console.log(emptyLeaves[0]);
 								oldopenFile &&
-								oldopenFile.apply(emptyLeaves[0], [file, openState]);
+									oldopenFile.apply(emptyLeaves[0], [file, openState]);
 								return;
 							}
 							else if (emptyLeaves.length <= 0) {
@@ -164,15 +164,15 @@ export default class Opener extends Plugin {
 					// console.log("openLinkText")
 					// console.log(newLeaf);
 					// console.log(openViewState);
-					if(newLeaf == 'tab' || newLeaf == true){
+					if (newLeaf == 'tab' || newLeaf == true) {
 						newLeaf = false;
-					}
-					else{
-					app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
+					} else {
+						app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
 							if (leaf.getViewState().state?.file == (sourcePath)) {
 								newLeaf = false;
 							}
-						})}
+						})
+					}
 					oldOpenLinkText &&
 						oldOpenLinkText.apply(this, [
 							linkText,
