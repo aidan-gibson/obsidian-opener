@@ -29,15 +29,15 @@ export default class Opener extends Plugin {
 		this.monkeyPatchopenFile();
 		this.monkeyPatchopenLinkText();
 		this.addCommand({
-      id: "open-graph-view-in-new-tab",
-      name: "Open Graph View in new tab",
-      callback: () => {
-			// @ts-ignore
-      this.app.commands.executeCommandById("workspace:new-tab");
-			// @ts-ignore
-			this.app.commands.executeCommandById("graph:open");
-      },
-    });
+			id: "open-graph-view-in-new-tab",
+			name: "Open Graph View in new tab",
+			callback: () => {
+				// @ts-ignore
+				this.app.commands.executeCommandById("workspace:new-tab");
+				// @ts-ignore
+				this.app.commands.executeCommandById("graph:open");
+			},
+		});
 	}
 
 
@@ -66,28 +66,24 @@ export default class Opener extends Plugin {
 			openFile(oldopenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
 					// console.log("new open file");
-					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg','3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
-					const OBSID_OPENABLE = ALLEXT.concat(['md','canvas','pdf']);
+					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg', '3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
+					const OBSID_OPENABLE = ALLEXT.concat(['md', 'canvas', 'pdf']);
 					// console.log("open file run")
-					if ((parentThis.settings.PDFApp && file.extension == 'pdf') || (parentThis.settings.allExt && ALLEXT.includes(file.extension)) || (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension))|| (!OBSID_OPENABLE.includes(file.extension) && (!parentThis.settings.custExtIn ||(parentThis.settings.custExtIn && !parentThis.settings.custExtInList.includes(file.extension))))) {
+					if ((parentThis.settings.PDFApp && file.extension == 'pdf') || (parentThis.settings.allExt && ALLEXT.includes(file.extension)) || (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension)) || (!OBSID_OPENABLE.includes(file.extension) && (!parentThis.settings.custExtIn || (parentThis.settings.custExtIn && !parentThis.settings.custExtInList.includes(file.extension))))) {
 						// @ts-ignore
 						app.openWithDefaultApp(file.path);
 						// console.log("open w default");
 						return;
 					}
 
-					// if clicking on link with same path as active file in view, defer to default behavior (ie headings, blocks, etc). file.path is thing being opened. app.workspace.getActiveFile()?.path is currently opened tab filepath.
+					// defer to default behavior if:
+					// - clicking on link with same path as active file in view (ie headings, blocks, etc). file.path is thing being opened. app.workspace.getActiveFile()?.path is currently opened tab filepath.
+					// - mode is preview (eg. hover editor, excalidraw, embeddings, etc) see issue #5
+					// - tab is linked to another tab (group), see issue #9
 					let openElsewhere = false;
 					const sameFile = file.path == app.workspace.getActiveFile()?.path;
-
-					if (sameFile) {
-						// console.log("same file");
-						oldopenFile && oldopenFile.apply(this, [file, openState]);
-						return;
-					}
-
-					// if mode is preview, defer to default behavior (eg. hover editor, excalidraw, embeddings, etc) see issue #5
-					else if (openState?.state?.mode === 'preview') {
+					const previewMode = openState?.state?.mode === 'preview';
+					if (sameFile || previewMode || this.group) {
 						oldopenFile && oldopenFile.apply(this, [file, openState]);
 						return;
 					}
@@ -124,7 +120,7 @@ export default class Opener extends Plugin {
 								// console.log("emptyLeaves.length > 0");
 								// console.log(emptyLeaves[0]);
 								oldopenFile &&
-								oldopenFile.apply(emptyLeaves[0], [file, openState]);
+									oldopenFile.apply(emptyLeaves[0], [file, openState]);
 								return;
 							}
 							else if (emptyLeaves.length <= 0) {
@@ -161,18 +157,19 @@ export default class Opener extends Plugin {
 					newLeaf?: PaneType | boolean,
 					openViewState?: OpenViewState
 				) {
-					// console.log("openLinkText")
-					// console.log(newLeaf);
-					// console.log(openViewState);
-					if(newLeaf == 'tab' || newLeaf == true){
+					if (this.activeLeaf?.group) {
+						// if in a group (linked tab)
+						// do nothing (revert to default behavior)
+						// this way ctrl/cmd + click still opens a new tab
+					} else if (newLeaf == 'tab' || newLeaf == true) {
 						newLeaf = false;
-					}
-					else{
-					app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
+					} else {
+						app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
 							if (leaf.getViewState().state?.file == (sourcePath)) {
 								newLeaf = false;
 							}
-						})}
+						})
+					}
 					oldOpenLinkText &&
 						oldOpenLinkText.apply(this, [
 							linkText,
