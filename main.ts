@@ -136,7 +136,7 @@ export default class Opener extends Plugin {
 					// - tab is linked to another tab (group), see issue #9
 					let openElsewhere = false;
 					const sameFile = file.path == app.workspace.getActiveFile()?.path;
-					const previewMode = openState?.state?.mode === 'preview';
+					const previewMode = !!openState?.state?.mode;
 					if (sameFile || previewMode || this.group) {
 						oldopenFile && oldopenFile.apply(this, [file, openState]);
 						return;
