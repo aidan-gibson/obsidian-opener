@@ -247,6 +247,10 @@ export default class Opener extends Plugin {
 								// console.log('bruv');
 								oldopenFile && oldopenFile.apply(leaf, [file, openState]);
 								openElsewhere = true;
+								// close potentially prepared empty leaf (fixes #14)
+								if (leaf !== this && this.getViewState()?.type == 'empty') {
+									this.detach();
+								}
 								// console.log("openElsewhere: ",openElsewhere);
 								// return;
 							}
