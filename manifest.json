@@ -5,6 +5,6 @@
 	"description": "Open links in new/existing tabs by default. Open PDFs in System App by default. Can open other file formats in System Apps if desired.",
 	"author": "Aidan Gibson",
 	"authorUrl": "https://github.com/aidan-gibson",
-	"isDesktopOnly": true,
+	"isDesktopOnly": false,
 	"version": "1.0.38"
 }
