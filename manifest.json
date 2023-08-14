@@ -3,8 +3,8 @@
 	"name": "Opener",
 	"minAppVersion": "0.15.9",
 	"description": "Open links in new/existing tabs by default. Open PDFs in System App by default. Can open other file formats in System Apps if desired.",
-	"author": "Aidan Gibson",
+	"author": "Aidan Gibson, LukeMT",
 	"authorUrl": "https://github.com/aidan-gibson",
 	"isDesktopOnly": false,
-	"version": "1.0.38"
+	"version": "1.1.0"
 }
