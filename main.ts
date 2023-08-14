@@ -18,6 +18,7 @@ import { OpenerSetting } from './types';
 
 export default class Opener extends Plugin {
 	settings: OpenerSetting;
+	sameTabOnce: boolean = false;
 	uninstallMonkeyPatchOpenFile: () => void;
 	uninstallMonkeyPatchOpenLinkText: () => void;
 
@@ -28,6 +29,73 @@ export default class Opener extends Plugin {
 		this.addSettingTab(new OpenerSettingTab(this.app, this));
 		this.monkeyPatchopenFile();
 		this.monkeyPatchopenLinkText();
+		this.addCommands();
+		this.addMenuItem();
+	}
+
+	addCommands() {
+		this.addCommand({
+			id: "same-tab-once",
+			name: "Open next file in same tab (Obsidian default behavior)",
+			checkCallback: (checking: boolean) => {
+				if (checking) {
+					return this.settings.newTab;
+				}
+				this.sameTabOnce = true;
+				new Notice("Next file will open in same tab");
+			}
+		});
+
+		this.addCommand({
+			id: "enable-new-tab",
+			name: "Enable new tab for all files",
+			checkCallback: (checking: boolean) => {
+				if (checking) {
+					return !this.settings.newTab;
+				}
+				this.settings.newTab = true;
+				this.saveSettings();
+				new Notice("Opener: New tab for all files enabled");
+			},
+		});
+		this.addCommand({
+			id: "disable-new-tab",
+			name: "Disable new tab for all files",
+			checkCallback: (checking: boolean) => {
+				if (checking) {
+					return this.settings.newTab;
+				}
+				this.settings.newTab = false;
+				this.saveSettings();
+				new Notice("Opener: New tab for all files disabled");
+			}
+		});
+
+		this.addCommand({
+			id: "enable-pdf",
+			name: "Enable open all PDFs with default app",
+			checkCallback: (checking: boolean) => {
+				if (checking) {
+					return !this.settings.PDFApp;
+				}
+				this.settings.PDFApp = true;
+				this.saveSettings();
+				new Notice("Opener: Open all PDFs with default app enabled");
+			}
+		});
+		this.addCommand({
+			id: "disable-pdf",
+			name: "Disable open all PDFs with default app",
+			checkCallback: (checking: boolean) => {
+				if (checking) {
+					return this.settings.PDFApp;
+				}
+				this.settings.PDFApp = false;
+				this.saveSettings();
+				new Notice("Opener: Open all PDFs with default app disabled");
+			}
+		});
+
 		this.addCommand({
 			id: "open-graph-view-in-new-tab",
 			name: "Open Graph View in new tab",
@@ -38,6 +106,24 @@ export default class Opener extends Plugin {
 				this.app.commands.executeCommandById("graph:open");
 			},
 		});
+	}
+
+	// add command to right-click menu
+	addMenuItem() {
+		this.registerEvent(
+			this.app.workspace.on("file-menu", (menu, file, source, leaf) => {
+				if (file instanceof TFile) {
+					menu.addItem((item) => {
+						item.setSection("open");
+						item.setTitle("Open in same tab")
+							.onClick(() => {
+								this.sameTabOnce = true;
+								this.app.workspace.getLeaf().openFile(file);
+							});
+					});
+				}
+			})
+		);
 	}
 
 
@@ -84,6 +170,12 @@ export default class Opener extends Plugin {
 					const sameFile = file.path == app.workspace.getActiveFile()?.path;
 					const previewMode = openState?.state?.mode === 'preview';
 					if (sameFile || previewMode || this.group) {
+						oldopenFile && oldopenFile.apply(this, [file, openState]);
+						return;
+					}
+
+					if (parentThis.sameTabOnce) {
+						parentThis.sameTabOnce = false;
 						oldopenFile && oldopenFile.apply(this, [file, openState]);
 						return;
 					}
