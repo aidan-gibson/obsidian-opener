@@ -82,12 +82,14 @@ export default class Opener extends Plugin {
 		}
 	}
 	addMetaKeyListeners() {
+		if (this.isMetaKeyHeld !== null) return; // already added
 		this.isMetaKeyHeld = false;
 		document.addEventListener('keydown', this.keyDownHandler);
 		document.addEventListener('keyup', this.keyUpHandler);
 		document.addEventListener('mousedown', this.mouseDownHandler, { capture: true });
 	}
 	removeMetaKeyListeners() {
+		if (this.isMetaKeyHeld === null) return; // already removed
 		document.removeEventListener('keydown', this.keyDownHandler);
 		document.removeEventListener('keyup', this.keyUpHandler);
 		document.removeEventListener('mousedown', this.mouseDownHandler, { capture: true });
@@ -95,9 +97,9 @@ export default class Opener extends Plugin {
 	}
 
 	updateMetaKeyListeners() {
-		if (this.settings.extOnlyWhenMetaKey && this.isMetaKeyHeld === null) {
+		if (this.settings.extOnlyWhenMetaKey) {
 			this.addMetaKeyListeners();
-		} else if (!this.settings.extOnlyWhenMetaKey && this.isMetaKeyHeld !== null) {
+		} else {
 			this.removeMetaKeyListeners();
 		}
 	}
