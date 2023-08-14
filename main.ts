@@ -18,7 +18,7 @@ import { OpenerSetting } from './types';
 
 export default class Opener extends Plugin {
 	settings: OpenerSetting;
-	isMetaKeyHeld: boolean = false;
+	isMetaKeyHeld: boolean | null = null;
 	uninstallMonkeyPatchOpenFile: () => void;
 	uninstallMonkeyPatchOpenLinkText: () => void;
 
@@ -27,7 +27,7 @@ export default class Opener extends Plugin {
 		await this.loadSettings();
 
 		this.addSettingTab(new OpenerSettingTab(this.app, this));
-		this.addMetaKeyListeners();
+		this.updateMetaKeyListeners();
 		this.monkeyPatchopenFile();
 		this.monkeyPatchopenLinkText();
 		this.addCommand({
@@ -58,6 +58,7 @@ export default class Opener extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		this.updateMetaKeyListeners();
 	}
 
 	// Meta key listeners
@@ -81,6 +82,7 @@ export default class Opener extends Plugin {
 		}
 	}
 	addMetaKeyListeners() {
+		this.isMetaKeyHeld = false;
 		document.addEventListener('keydown', this.keyDownHandler);
 		document.addEventListener('keyup', this.keyUpHandler);
 		document.addEventListener('mousedown', this.mouseDownHandler, { capture: true });
@@ -89,6 +91,15 @@ export default class Opener extends Plugin {
 		document.removeEventListener('keydown', this.keyDownHandler);
 		document.removeEventListener('keyup', this.keyUpHandler);
 		document.removeEventListener('mousedown', this.mouseDownHandler, { capture: true });
+		this.isMetaKeyHeld = null;
+	}
+
+	updateMetaKeyListeners() {
+		if (this.settings.extOnlyWhenMetaKey && this.isMetaKeyHeld === null) {
+			this.addMetaKeyListeners();
+		} else if (!this.settings.extOnlyWhenMetaKey && this.isMetaKeyHeld !== null) {
+			this.removeMetaKeyListeners();
+		}
 	}
 
 	monkeyPatchopenFile() {
