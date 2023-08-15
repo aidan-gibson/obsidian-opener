@@ -197,13 +197,25 @@ export default class Opener extends Plugin {
 					const defaultBehavior = () => {
 						return oldOpenFile.apply(this, [file, openState]);
 					}
-					// defer to default behavior if:
-					// - clicking on link with same path as active file in view (ie headings, blocks, etc). file.path is thing being opened. app.workspace.getActiveFile()?.path is currently opened tab filepath.
-					// - mode is preview (eg. hover editor, excalidraw, embeddings, etc) see issue #5
-					// - tab is linked to another tab (group), see issue #9
-					const sameFile = file.path == app.workspace.getActiveFile()?.path;
-					const previewMode = !!openState?.state?.mode;
 
+					// embedded iframes
+					if (openState?.state?.mode) {
+						// mode is preview or source (eg. hover editor, excalidraw, embeddings, etc) see issue #5 and #21
+						return defaultBehavior();
+					}
+
+					// same file
+					if (file.path == app.workspace.getActiveFile()?.path) {
+						// clicking on link with same path as active file in view (ie headings, blocks, etc). file.path is thing being opened. app.workspace.getActiveFile()?.path is currently opened tab filepath.
+						return defaultBehavior();
+					}
+
+					if (parentThis.sameTabOnce) {
+						parentThis.sameTabOnce = false;
+						return defaultBehavior();
+					}
+
+					// external files
 					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg', '3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
 					const OBSID_OPENABLE = ALLEXT.concat(['md', 'canvas', 'pdf']);
 					if (
@@ -214,25 +226,24 @@ export default class Opener extends Plugin {
 						)
 						&& (!parentThis.settings.extOnlyWhenMetaKey || parentThis.isMetaKeyHeld)
 					) {
+						new Notice('Opening external file with default app (Opener Plugin)');
 						// @ts-ignore-next-line
 						app.openWithDefaultApp(file.path);
 						return;
-					}
-
-					if (sameFile || previewMode || this.group) {
-						return defaultBehavior();
-					}
-
-					if (parentThis.sameTabOnce) {
-						parentThis.sameTabOnce = false;
-						return defaultBehavior();
 					}
 
 					if (!parentThis.settings.newTab) {
 						return defaultBehavior();
 					}
 
-					// else if already open in another tab, switch to that tab
+					// linked tabs
+					if (this.group) {
+						// - tab is linked to another tab (group), see issue #9
+						new Notice('Opener: This is a Linked Tab! Opening in same tab therefore.');
+						return defaultBehavior();
+					}
+
+					// if already open in another tab, switch to that tab
 					let openElsewhere = false;
 					app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
 						// if (leaf.getViewState().state?.file == file.name) {
@@ -250,21 +261,18 @@ export default class Opener extends Plugin {
 					});
 					if (openElsewhere) return;
 
-					// open in new tab
 					// if there's already an empty leaf, pick that one
 					const emptyLeaves = app.workspace.getLeavesOfType('empty');
 					if (emptyLeaves.length > 0) {
 						return oldOpenFile.apply(emptyLeaves[0], [file, openState]);
 					}
 
-					if (emptyLeaves.length <= 0) {
-						return oldOpenFile.apply(this.app.workspace.getLeaf('tab'), [
-							file,
-							openState,
-						]);
-					}
-
-				};
+					// culmination spear
+					return oldOpenFile.apply(this.app.workspace.getLeaf('tab'), [
+						file,
+						openState,
+					]);
+				}
 			},
 		});
 	}
