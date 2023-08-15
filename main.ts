@@ -29,11 +29,29 @@ export default class Opener extends Plugin {
 
 		this.addSettingTab(new OpenerSettingTab(this.app, this));
 		this.updateMetaKeyListeners();
-		this.monkeyPatchopenFile();
+		this.monkeyPatchOpenFile();
 		this.monkeyPatchopenLinkText();
 		this.addCommands();
 		this.addMenuItem();
 	}
+
+	onunload(): void {
+		this.uninstallMonkeyPatchOpenFile && this.uninstallMonkeyPatchOpenFile();
+		this.removeMetaKeyListeners();
+		console.log('unloading ' + this.manifest.name + ' plugin');
+	}
+
+	async loadSettings() {
+		// At first startup, `data` is `null` because data.json does not exist.
+		const data = (await this.loadData()) as OpenerSetting | null;
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
+		this.updateMetaKeyListeners();
+	}
+
 
 	addCommands() {
 		this.addCommand({
@@ -129,23 +147,6 @@ export default class Opener extends Plugin {
 	}
 
 
-	onunload(): void {
-		this.uninstallMonkeyPatchOpenFile && this.uninstallMonkeyPatchOpenFile();
-		this.uninstallMonkeyPatchOpenLinkText && this.uninstallMonkeyPatchOpenLinkText();
-		this.removeMetaKeyListeners();
-		console.log('unloading ' + this.manifest.name + ' plugin');
-	}
-
-	async loadSettings() {
-		// At first startup, `data` is `null` because data.json does not exist.
-		const data = (await this.loadData()) as OpenerSetting | null;
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-		this.updateMetaKeyListeners();
-	}
 
 	// Meta key listeners
 	// arrow syntax to preserve `this` context
@@ -175,7 +176,7 @@ export default class Opener extends Plugin {
 		document.addEventListener('mousedown', this.mouseDownHandler, { capture: true });
 	}
 	removeMetaKeyListeners() {
-		if (this.isMetaKeyHeld === null) return; // already removed
+		if (this.isMetaKeyHeld === null) return; // nothing to remove
 		document.removeEventListener('keydown', this.keyDownHandler);
 		document.removeEventListener('keyup', this.keyUpHandler);
 		document.removeEventListener('mousedown', this.mouseDownHandler, { capture: true });
@@ -190,7 +191,7 @@ export default class Opener extends Plugin {
 		}
 	}
 
-	monkeyPatchopenFile() {
+	monkeyPatchOpenFile() {
 
 		// TODO
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
