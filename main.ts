@@ -230,7 +230,7 @@ export default class Opener extends Plugin {
 						return defaultBehavior();
 					}
 
-					else if (parentThis.settings.newTab && !sameFile) {
+					if (parentThis.settings.newTab) {
 						// else if already open in another tab, switch to that tab
 						app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
 							// if (leaf.getViewState().state?.file == file.name) {
@@ -248,7 +248,7 @@ export default class Opener extends Plugin {
 						});
 
 						// else open in new tab
-						if (!openElsewhere && parentThis.settings.newTab && !sameFile) {
+						if (!openElsewhere && parentThis.settings.newTab) {
 							// if there's already an empty leaf, pick that one
 							const emptyLeaves = app.workspace.getLeavesOfType('empty');
 							if (emptyLeaves.length > 0) {
