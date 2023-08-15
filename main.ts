@@ -21,7 +21,6 @@ export default class Opener extends Plugin {
 	isMetaKeyHeld: boolean | null = null;
 	sameTabOnce: boolean = false;
 	uninstallMonkeyPatchOpenFile: () => void;
-	uninstallMonkeyPatchOpenLinkText: () => void;
 
 	async onload() {
 		console.log('loading ' + this.manifest.name + ' plugin');
@@ -30,7 +29,6 @@ export default class Opener extends Plugin {
 		this.addSettingTab(new OpenerSettingTab(this.app, this));
 		this.updateMetaKeyListeners();
 		this.monkeyPatchOpenFile();
-		this.monkeyPatchopenLinkText();
 		this.addCommands();
 		this.addMenuItem();
 	}
@@ -248,7 +246,7 @@ export default class Opener extends Plugin {
 								// console.log('bruv');
 								oldopenFile && oldopenFile.apply(leaf, [file, openState]);
 								openElsewhere = true;
-								// close potentially prepared empty leaf (fixes #14)
+								// close potentially prepared empty leaf (fixes #14 and #1)
 								if (leaf !== this && this.getViewState()?.type == 'empty') {
 									this.detach();
 								}
@@ -292,42 +290,6 @@ export default class Opener extends Plugin {
 						oldopenFile && oldopenFile.apply(this, [file, openState]);
 						return;
 					}
-				};
-			},
-		});
-	}
-
-	// if note already exists, monkeyPatchopenFile() does its job and moves to that one. but openLinkText() with options selected for new tab (invoked via Right Click > Open in New Tab or Quick Switcher Cmd+Enter, etc) will still open a new tab.
-	monkeyPatchopenLinkText() {
-		let parentThis = this;
-		this.uninstallMonkeyPatchOpenLinkText = around(Workspace.prototype, {
-			openLinkText(oldOpenLinkText) {
-				return async function (
-					linkText: string,
-					sourcePath: string,
-					newLeaf?: PaneType | boolean,
-					openViewState?: OpenViewState
-				) {
-					if (this.activeLeaf?.group) {
-						// if in a group (linked tab)
-						// do nothing (revert to default behavior)
-						// this way ctrl/cmd + click still opens a new tab
-					} else if (newLeaf == 'tab' || newLeaf == true) {
-						newLeaf = false;
-					} else {
-						app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
-							if (leaf.getViewState().state?.file == (sourcePath)) {
-								newLeaf = false;
-							}
-						})
-					}
-					oldOpenLinkText &&
-						oldOpenLinkText.apply(this, [
-							linkText,
-							sourcePath,
-							newLeaf,
-							openViewState,
-						]);
 				};
 			},
 		});
