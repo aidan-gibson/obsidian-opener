@@ -18,6 +18,7 @@ import { OpenerSetting } from './types';
 
 export default class Opener extends Plugin {
 	settings: OpenerSetting;
+	isMetaKeyHeld: boolean | null = null;
 	sameTabOnce: boolean = false;
 	uninstallMonkeyPatchOpenFile: () => void;
 	uninstallMonkeyPatchOpenLinkText: () => void;
@@ -27,6 +28,7 @@ export default class Opener extends Plugin {
 		await this.loadSettings();
 
 		this.addSettingTab(new OpenerSettingTab(this.app, this));
+		this.updateMetaKeyListeners();
 		this.monkeyPatchopenFile();
 		this.monkeyPatchopenLinkText();
 		this.addCommands();
@@ -130,6 +132,7 @@ export default class Opener extends Plugin {
 	onunload(): void {
 		this.uninstallMonkeyPatchOpenFile && this.uninstallMonkeyPatchOpenFile();
 		this.uninstallMonkeyPatchOpenLinkText && this.uninstallMonkeyPatchOpenLinkText();
+		this.removeMetaKeyListeners();
 		console.log('unloading ' + this.manifest.name + ' plugin');
 	}
 
@@ -141,6 +144,50 @@ export default class Opener extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		this.updateMetaKeyListeners();
+	}
+
+	// Meta key listeners
+	// arrow syntax to preserve `this` context
+	keyDownHandler = (e: KeyboardEvent) => {
+		if (e.key === 'Meta' || e.key === 'Control') {
+			this.isMetaKeyHeld = true;
+		}
+	}
+	keyUpHandler = (e: KeyboardEvent) => {
+		if (e.key === 'Meta' || e.key === 'Control') {
+			this.isMetaKeyHeld = false;
+		}
+	}
+	// Mouse handler is needed because the key handler will not fire if the app is out of focus
+	mouseDownHandler = (e: MouseEvent) => {
+		if (e.metaKey || e.ctrlKey) {
+			this.isMetaKeyHeld = true;
+		} else {
+			this.isMetaKeyHeld = false;
+		}
+	}
+	addMetaKeyListeners() {
+		if (this.isMetaKeyHeld !== null) return; // already added
+		this.isMetaKeyHeld = false;
+		document.addEventListener('keydown', this.keyDownHandler);
+		document.addEventListener('keyup', this.keyUpHandler);
+		document.addEventListener('mousedown', this.mouseDownHandler, { capture: true });
+	}
+	removeMetaKeyListeners() {
+		if (this.isMetaKeyHeld === null) return; // already removed
+		document.removeEventListener('keydown', this.keyDownHandler);
+		document.removeEventListener('keyup', this.keyUpHandler);
+		document.removeEventListener('mousedown', this.mouseDownHandler, { capture: true });
+		this.isMetaKeyHeld = null;
+	}
+
+	updateMetaKeyListeners() {
+		if (this.settings.extOnlyWhenMetaKey) {
+			this.addMetaKeyListeners();
+		} else {
+			this.removeMetaKeyListeners();
+		}
 	}
 
 	monkeyPatchopenFile() {
@@ -155,7 +202,14 @@ export default class Opener extends Plugin {
 					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg', '3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
 					const OBSID_OPENABLE = ALLEXT.concat(['md', 'canvas', 'pdf']);
 					// console.log("open file run")
-					if ((parentThis.settings.PDFApp && file.extension == 'pdf') || (parentThis.settings.allExt && ALLEXT.includes(file.extension)) || (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension)) || (!OBSID_OPENABLE.includes(file.extension) && (!parentThis.settings.custExtIn || (parentThis.settings.custExtIn && !parentThis.settings.custExtInList.includes(file.extension))))) {
+					if (
+						((parentThis.settings.PDFApp && file.extension == 'pdf')
+							|| (parentThis.settings.allExt && ALLEXT.includes(file.extension))
+							|| (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension))
+							|| (!OBSID_OPENABLE.includes(file.extension) && (!parentThis.settings.custExtIn || (parentThis.settings.custExtIn && !parentThis.settings.custExtInList.includes(file.extension))))
+						)
+						&& (!parentThis.settings.extOnlyWhenMetaKey || parentThis.isMetaKeyHeld)
+					) {
 						// @ts-ignore
 						app.openWithDefaultApp(file.path);
 						// console.log("open w default");
