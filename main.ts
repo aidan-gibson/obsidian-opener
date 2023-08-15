@@ -194,13 +194,18 @@ export default class Opener extends Plugin {
 		this.uninstallMonkeyPatchOpenFile = around(WorkspaceLeaf.prototype, {
 			openFile(oldOpenFile) {
 				return async function (file: TFile, openState?: OpenViewState) {
-					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg', '3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
-					const OBSID_OPENABLE = ALLEXT.concat(['md', 'canvas', 'pdf']);
-
 					const defaultBehavior = () => {
 						return oldOpenFile.apply(this, [file, openState]);
 					}
+					// defer to default behavior if:
+					// - clicking on link with same path as active file in view (ie headings, blocks, etc). file.path is thing being opened. app.workspace.getActiveFile()?.path is currently opened tab filepath.
+					// - mode is preview (eg. hover editor, excalidraw, embeddings, etc) see issue #5
+					// - tab is linked to another tab (group), see issue #9
+					const sameFile = file.path == app.workspace.getActiveFile()?.path;
+					const previewMode = !!openState?.state?.mode;
 
+					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg', '3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
+					const OBSID_OPENABLE = ALLEXT.concat(['md', 'canvas', 'pdf']);
 					if (
 						((parentThis.settings.PDFApp && file.extension == 'pdf')
 							|| (parentThis.settings.allExt && ALLEXT.includes(file.extension))
@@ -214,13 +219,6 @@ export default class Opener extends Plugin {
 						return;
 					}
 
-					// defer to default behavior if:
-					// - clicking on link with same path as active file in view (ie headings, blocks, etc). file.path is thing being opened. app.workspace.getActiveFile()?.path is currently opened tab filepath.
-					// - mode is preview (eg. hover editor, excalidraw, embeddings, etc) see issue #5
-					// - tab is linked to another tab (group), see issue #9
-					let openElsewhere = false;
-					const sameFile = file.path == app.workspace.getActiveFile()?.path;
-					const previewMode = !!openState?.state?.mode;
 					if (sameFile || previewMode || this.group) {
 						return defaultBehavior();
 					}
@@ -230,51 +228,44 @@ export default class Opener extends Plugin {
 						return defaultBehavior();
 					}
 
-					if (parentThis.settings.newTab) {
-						// else if already open in another tab, switch to that tab
-						app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
-							// if (leaf.getViewState().state?.file == file.name) {
-							// leaf.getViewState().state?.file = 'Folder/folder note.md' (if it's within a folder). this will not match with file.name
-							// console.log(file.path);
-							// if (leaf.getViewState().state?.file?.endsWith(file.name)) { //this works. but also:
-							if (leaf.getViewState().state?.file == (file.path) && leaf.getViewState().type != 'canvas') {
-								oldOpenFile && oldOpenFile.apply(leaf, [file, openState]);
-								openElsewhere = true;
-								// close potentially prepared empty leaf (fixes #14 and #1)
-								if (leaf !== this && this.getViewState()?.type == 'empty') {
-									this.detach();
-								}
-							}
-						});
-
-						// else open in new tab
-						if (!openElsewhere && parentThis.settings.newTab) {
-							// if there's already an empty leaf, pick that one
-							const emptyLeaves = app.workspace.getLeavesOfType('empty');
-							if (emptyLeaves.length > 0) {
-								oldOpenFile &&
-									oldOpenFile.apply(emptyLeaves[0], [file, openState]);
-								return;
-							}
-							else if (emptyLeaves.length <= 0) {
-								// console.log("emptyLeaves.length <= 0");
-								oldOpenFile &&
-									oldOpenFile.apply(this.app.workspace.getLeaf('tab'), [
-										file,
-										openState,
-									]);
-								return;
-							}
-						}
-					}
-
-					// default behavior
-					else if (!parentThis.settings.newTab) {
+					if (!parentThis.settings.newTab) {
 						return defaultBehavior();
 					}
+
+					// else if already open in another tab, switch to that tab
+					let openElsewhere = false;
+					app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
+						// if (leaf.getViewState().state?.file == file.name) {
+						// leaf.getViewState().state?.file = 'Folder/folder note.md' (if it's within a folder). this will not match with file.name
+						// console.log(file.path);
+						// if (leaf.getViewState().state?.file?.endsWith(file.name)) { //this works. but also:
+						if (leaf.getViewState().state?.file == (file.path) && leaf.getViewState().type != 'canvas') {
+							oldOpenFile && oldOpenFile.apply(leaf, [file, openState]);
+							openElsewhere = true;
+							// close potentially prepared empty leaf (fixes #14 and #1)
+							if (leaf !== this && this.getViewState()?.type == 'empty') {
+								this.detach();
+							}
+						}
+					});
+					if (openElsewhere) return;
+
+					// open in new tab
+					// if there's already an empty leaf, pick that one
+					const emptyLeaves = app.workspace.getLeavesOfType('empty');
+					if (emptyLeaves.length > 0) {
+						return oldOpenFile.apply(emptyLeaves[0], [file, openState]);
+					}
+
+					if (emptyLeaves.length <= 0) {
+						return oldOpenFile.apply(this.app.workspace.getLeaf('tab'), [
+							file,
+							openState,
+						]);
+					}
+
 				};
 			},
 		});
 	}
-
 }
