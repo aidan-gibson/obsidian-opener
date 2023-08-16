@@ -275,10 +275,9 @@ export default class Opener extends Plugin {
             }
           }
 
-          // if there's already an empty leaf, pick that one
-          const emptyLeaves = app.workspace.getLeavesOfType('empty');
-          if (emptyLeaves.length > 0) {
-            return oldOpenFile.apply(emptyLeaves[0], [file, openState]);
+          // if an empty leave was already prepared, use that one
+          if (this.getViewState()?.type == 'empty') {
+            return defaultBehavior()
           }
 
           // culmination spear
