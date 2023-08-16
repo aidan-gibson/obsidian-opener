@@ -219,17 +219,19 @@ export default class Opener extends Plugin {
 					const ALLEXT = ['png', 'webp', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'mp3', 'webm', 'wav', 'm4a', 'ogg', '3gp', 'flac', 'mp4', 'ogv', 'mov', 'mkv'];
 					const OBSID_OPENABLE = ALLEXT.concat(['md', 'canvas', 'pdf']);
 					if (
-						((parentThis.settings.PDFApp && file.extension == 'pdf')
-							|| (parentThis.settings.allExt && ALLEXT.includes(file.extension))
-							|| (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension))
-							|| (!OBSID_OPENABLE.includes(file.extension) && (!parentThis.settings.custExtIn || (parentThis.settings.custExtIn && !parentThis.settings.custExtInList.includes(file.extension))))
-						)
-						&& (!parentThis.settings.extOnlyWhenMetaKey || parentThis.isMetaKeyHeld)
+						(parentThis.settings.PDFApp && file.extension == 'pdf')
+						|| (parentThis.settings.allExt && ALLEXT.includes(file.extension))
+						|| (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension))
+						|| (!OBSID_OPENABLE.includes(file.extension) && (!parentThis.settings.custExtIn || (parentThis.settings.custExtIn && !parentThis.settings.custExtInList.includes(file.extension))))
 					) {
-						new Notice('Opening external file with default app (Opener Plugin)');
-						// @ts-ignore-next-line
-						app.openWithDefaultApp(file.path);
-						return;
+						if (!parentThis.settings.extOnlyWhenMetaKey || parentThis.isMetaKeyHeld) {
+							new Notice('Opening external file with default app (Opener Plugin)');
+							// @ts-ignore-next-line
+							app.openWithDefaultApp(file.path);
+							return;
+						} else {
+							new Notice('Opener Tip: Hold Cmd/Ctrl key to open with default app');
+						}
 					}
 
 					if (!parentThis.settings.newTab) {
