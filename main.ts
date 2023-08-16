@@ -246,18 +246,13 @@ export default class Opener extends Plugin {
           }
 
           // if already open in another tab, switch to that tab
-          let openElsewhere = false;
-          const switchToTabIfMatching = (leaf: WorkspaceLeaf) => {
+          const matchingLeaves: WorkspaceLeaf[] = [];
+          const pushLeaveIfMatching = (leaf: WorkspaceLeaf) => {
             if (leaf.getViewState().state?.file == (file.path) && leaf.getViewState().type != 'canvas') {
-              oldOpenFile.apply(leaf, [file, openState]);
-              openElsewhere = true;
-              // close potentially prepared empty leaf (fixes #14 and #1)
-              if (leaf !== this && this.getViewState()?.type == 'empty') {
-                this.detach();
-              }
+              matchingLeaves.push(leaf);
             }
           }
-          app.workspace.iterateRootLeaves(switchToTabIfMatching);
+          app.workspace.iterateRootLeaves(pushLeaveIfMatching);
           // check floating windows
           app.workspace.getLayout()?.floating?.children?.forEach((win: any) => {
             if (win?.type !== "window") return console.log("Opener-Plugin: Strange floating object found (no window)", win)
@@ -265,11 +260,20 @@ export default class Opener extends Plugin {
               if (tabs?.type !== "tabs") return console.log("Opener-Plugin: Strange floating object found (no tabs)", tabs)
               tabs.children?.forEach((leaf: any) => {
                 if (leaf?.type !== "leaf") return console.log("Opener-Plugin: Strange floating object found (no leaf)", leaf)
-                switchToTabIfMatching(app.workspace.getLeafById(leaf.id))
+                pushLeaveIfMatching(app.workspace.getLeafById(leaf.id))
               })
             })
           })
-          if (openElsewhere) return;
+          if (matchingLeaves.length) {
+            if (this.getViewState()?.type == 'empty') {
+              // if an empty leave was already prepared, use that one (happens when commands like "Open in new tab" are used)
+              new Notice(`File is now open in ${matchingLeaves.length + 1} Tabs`);
+              return defaultBehavior()
+            } else {
+              // switch to first matching leaf
+              return oldOpenFile.apply(matchingLeaves[0], [file, openState]);
+            }
+          }
 
           // if there's already an empty leaf, pick that one
           const emptyLeaves = app.workspace.getLeavesOfType('empty');
