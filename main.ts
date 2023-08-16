@@ -247,20 +247,28 @@ export default class Opener extends Plugin {
 
 					// if already open in another tab, switch to that tab
 					let openElsewhere = false;
-					app.workspace.iterateRootLeaves((leaf: WorkspaceLeaf) => {
-						// if (leaf.getViewState().state?.file == file.name) {
-						// leaf.getViewState().state?.file = 'Folder/folder note.md' (if it's within a folder). this will not match with file.name
-						// console.log(file.path);
-						// if (leaf.getViewState().state?.file?.endsWith(file.name)) { //this works. but also:
+					const switchToTabIfMatching = (leaf: WorkspaceLeaf) => {
 						if (leaf.getViewState().state?.file == (file.path) && leaf.getViewState().type != 'canvas') {
-							oldOpenFile && oldOpenFile.apply(leaf, [file, openState]);
+							oldOpenFile.apply(leaf, [file, openState]);
 							openElsewhere = true;
 							// close potentially prepared empty leaf (fixes #14 and #1)
 							if (leaf !== this && this.getViewState()?.type == 'empty') {
 								this.detach();
 							}
 						}
-					});
+					}
+					app.workspace.iterateRootLeaves(switchToTabIfMatching);
+					// check floating windows
+					app.workspace.getLayout()?.floating?.children?.forEach((win: any) => {
+						if (win?.type !== "window") return console.log("Opener-Plugin: Strange floating object found (no window)", win)
+						win.children?.forEach((tabs: any) => {
+							if (tabs?.type !== "tabs") return console.log("Opener-Plugin: Strange floating object found (no tabs)", tabs)
+							tabs.children?.forEach((leaf: any) => {
+								if (leaf?.type !== "leaf") return console.log("Opener-Plugin: Strange floating object found (no leaf)", leaf)
+								switchToTabIfMatching(app.workspace.getLeafById(leaf.id))
+							})
+						})
+					})
 					if (openElsewhere) return;
 
 					// if there's already an empty leaf, pick that one
