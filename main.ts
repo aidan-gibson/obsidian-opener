@@ -193,13 +193,14 @@ export default class Opener extends Plugin {
     const parentThis = this;
     this.uninstallMonkeyPatchOpenFile = around(WorkspaceLeaf.prototype, {
       openFile(oldOpenFile) {
-        return async function (file: TFile, openState?: OpenViewState) {
+        return async function (this: WorkspaceLeaf, file: TFile, openState?: OpenViewState) {
           const defaultBehavior = () => {
             return oldOpenFile.apply(this, [file, openState]);
           }
+          const preparedEmptyLeave = this.getViewState()?.type == 'empty';
 
           // embedded iframes
-          if (openState?.state?.mode) {
+          if (openState?.state?.mode && preparedEmptyLeave) {
             // mode is preview or source (eg. hover editor, excalidraw, embeddings, etc) see issue #5 and #21
             return defaultBehavior();
           }
@@ -226,6 +227,10 @@ export default class Opener extends Plugin {
           ) {
             if (!parentThis.settings.extOnlyWhenMetaKey || parentThis.isMetaKeyHeld) {
               new Notice('Opening external file with default app (Opener Plugin)');
+              if (preparedEmptyLeave) {
+                // close prepared empty tab
+                this.detach();
+              }
               // @ts-ignore-next-line
               app.openWithDefaultApp(file.path);
               return;
@@ -239,7 +244,7 @@ export default class Opener extends Plugin {
           }
 
           // linked tabs
-          if (this.group) {
+          if ((this as any).group) {
             // - tab is linked to another tab (group), see issue #9
             new Notice('Opener: This is a Linked Tab! Opening in same tab therefore.');
             return defaultBehavior();
@@ -248,7 +253,7 @@ export default class Opener extends Plugin {
           // if already open in another tab, switch to that tab
           const matchingLeaves: WorkspaceLeaf[] = [];
           const pushLeaveIfMatching = (leaf: WorkspaceLeaf) => {
-            if (leaf.getViewState().state?.file == (file.path) && leaf.getViewState().type != 'canvas') {
+            if (leaf.getViewState().state?.file == (file.path)) {
               matchingLeaves.push(leaf);
             }
           }
@@ -265,7 +270,7 @@ export default class Opener extends Plugin {
             })
           })
           if (matchingLeaves.length) {
-            if (this.getViewState()?.type == 'empty') {
+            if (preparedEmptyLeave) {
               // if an empty leave was already prepared, use that one (happens when commands like "Open in new tab" are used)
               new Notice(`File is now open in ${matchingLeaves.length + 1} Tabs`);
               return defaultBehavior()
@@ -276,12 +281,12 @@ export default class Opener extends Plugin {
           }
 
           // if an empty leave was already prepared, use that one
-          if (this.getViewState()?.type == 'empty') {
+          if (preparedEmptyLeave) {
             return defaultBehavior()
           }
 
           // culmination spear
-          return oldOpenFile.apply(this.app.workspace.getLeaf('tab'), [
+          return oldOpenFile.apply(app.workspace.getLeaf('tab'), [
             file,
             openState,
           ]);
