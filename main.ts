@@ -223,7 +223,6 @@ export default class Opener extends Plugin {
             (parentThis.settings.PDFApp && file.extension == 'pdf')
             || (parentThis.settings.allExt && ALLEXT.includes(file.extension))
             || (parentThis.settings.custExt && parentThis.settings.custExtList.includes(file.extension))
-            || (!OBSID_OPENABLE.includes(file.extension) && (!parentThis.settings.custExtIn || (parentThis.settings.custExtIn && !parentThis.settings.custExtInList.includes(file.extension))))
           ) {
             if (!parentThis.settings.extOnlyWhenMetaKey || parentThis.isMetaKeyHeld) {
               new Notice('Opening external file with default app (Opener Plugin)');

@@ -70,25 +70,5 @@ export class OpenerSettingTab extends PluginSettingTab {
             plugin.saveSettings();
           });
       });
-    new Setting(containerEl)
-      .setName("Open Inside Obsidian: Manual List")
-      .setDesc("For example, if you're using HTMLViewer plugin that lets you view HTML inside Obsidian.")
-      .addToggle((toggle) =>
-        toggle.setValue(plugin.settings.custExtIn).onChange((value) => {
-          plugin.settings.custExtIn = value;
-          plugin.saveSettings();
-        })
-      );
-    new Setting(containerEl)
-      .setName("Open Inside Obsidian: Manual List")
-      .setDesc("Enter extension names (without the dot, ie, just docx separated by newlines).")
-      .addTextArea((textArea) => {
-        textArea
-          .setValue(plugin.settings.custExtInList.join('\n'))
-          .onChange(async (value) => {
-            plugin.settings.custExtInList = value.split('\n');
-            plugin.saveSettings();
-          });
-      });
   }
 }
