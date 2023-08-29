@@ -230,8 +230,8 @@ export default class Opener extends Plugin {
                 // close prepared empty tab
                 this.detach();
               }
-              // @ts-ignore-next-line
-              app.openWithDefaultApp(file.path);
+              // @ts-ignore
+              parentThis.app.openWithDefaultApp(file.path);
               return;
             } else {
               new Notice('Opener Tip: Hold Cmd/Ctrl key to open with default app');
@@ -282,6 +282,12 @@ export default class Opener extends Plugin {
           // if an empty leave was already prepared, use that one
           if (preparedEmptyLeave) {
             return defaultBehavior()
+          }
+
+          // if the file type cannot be opened in Obsidian, don't open a new empty tab
+          // @ts-ignore
+          if (!parentThis.app.viewRegistry?.getTypeByExtension(file.extension)) {
+            return defaultBehavior();
           }
 
           // culmination spear
