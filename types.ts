@@ -5,6 +5,4 @@ export interface OpenerSetting {
   allExt: boolean;
   custExt: boolean;
   custExtList: string[];
-  custExtIn: boolean;
-  custExtInList: string[];
 }
