@@ -7,6 +7,4 @@ export const DEFAULT_SETTINGS: OpenerSetting = {
 	allExt: false,
 	custExt: false,
 	custExtList: [],
-	custExtIn: false,
-	custExtInList: [],
 };
