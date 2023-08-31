@@ -206,7 +206,7 @@ export default class Opener extends Plugin {
           }
 
           // same file
-          if (file.path == app.workspace.getActiveFile()?.path) {
+          if (file.path == app.workspace.getActiveFile()?.path && openState?.eState?.subpath) {
             // clicking on link with same path as active file in view (ie headings, blocks, etc). file.path is thing being opened. app.workspace.getActiveFile()?.path is currently opened tab filepath.
             return defaultBehavior();
           }
