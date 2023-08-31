@@ -57,18 +57,23 @@ export class OpenerSettingTab extends PluginSettingTab {
         toggle.setValue(plugin.settings.custExt).onChange((value) => {
           plugin.settings.custExt = value;
           plugin.saveSettings();
+          this.display();
         })
       );
-    new Setting(containerEl)
-      .setName("Open Outside Obsidian: Manual List")
-      .setDesc("Enter extension names (without the dot, ie, just docx separated by newlines).")
-      .addTextArea((textArea) => {
-        textArea
-          .setValue(plugin.settings.custExtList.join('\n'))
-          .onChange(async (value) => {
-            plugin.settings.custExtList = value.split('\n');
-            plugin.saveSettings();
-          });
-      });
+    if (plugin.settings.custExt) {
+      new Setting(containerEl)
+        .setName("Manual List")
+        .setDesc("Enter extension names (without the dot, ie, just docx separated by newlines).")
+        .addTextArea((textArea) => {
+          textArea.inputEl.rows = 5;
+          textArea
+            .setValue(plugin.settings.custExtList.join('\n'))
+            .onChange(async (value) => {
+              plugin.settings.custExtList = value.split('\n');
+              plugin.saveSettings();
+            });
+        })
+        .settingEl.style.borderTop = "none";
+    }
   }
 }
