@@ -1,4 +1,4 @@
-# Check out https://github.com/czottmann/obsidian-mononote instead! This is no longer maintained.
+# 🚨 Check out https://github.com/czottmann/obsidian-mononote instead! This is no longer maintained. 🚨
 
 
 # old stuff
