@@ -1,6 +1,7 @@
-Check out https://github.com/czottmann/obsidian-mononote instead! This is no longer maintained.
+# Check out https://github.com/czottmann/obsidian-mononote instead! This is no longer maintained.
 
 
+# old stuff
 
 obsidian-opener:
 * opens md in new tabs (unless tab already exists, then switches to that tab).
