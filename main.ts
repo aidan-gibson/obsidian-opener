@@ -274,7 +274,9 @@ export default class Opener extends Plugin {
               new Notice(`File is now open in ${matchingLeaves.length + 1} Tabs`);
               return defaultBehavior()
             } else {
-              // switch to first matching leaf
+              // switch to first matching leaf              
+              this.app.workspace.setActiveLeaf(matchingLeaves[0]);
+              // could also return a no-op
               return oldOpenFile.apply(matchingLeaves[0], [file, openState]);
             }
           }
