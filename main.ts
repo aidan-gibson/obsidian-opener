@@ -275,7 +275,7 @@ export default class Opener extends Plugin {
               return defaultBehavior()
             } else {
               // switch to first matching leaf              
-              this.app.workspace.setActiveLeaf(matchingLeaves[0]);
+              parentThis.app.workspace.setActiveLeaf(matchingLeaves[0]);
               // could also return a no-op
               return oldOpenFile.apply(matchingLeaves[0], [file, openState]);
             }
@@ -293,7 +293,19 @@ export default class Opener extends Plugin {
           }
 
           // culmination spear
-          return oldOpenFile.apply(app.workspace.getLeaf('tab'), [
+          const newLeaf = app.workspace.getLeaf('tab');
+
+          // Redirect ephemeral state to new leaf. This is for Templater. See #57
+          const setEphemeralState = this.setEphemeralState;
+          this.setEphemeralState = (state) => {
+            console.log("Opener-Plugin: Redirecting ephemeral state to new leaf", state);
+            newLeaf.setEphemeralState.apply(newLeaf, [state]);
+          };
+          setTimeout(() => {
+            this.setEphemeralState = setEphemeralState;
+          }, 1500);
+
+          return oldOpenFile.apply(newLeaf, [
             file,
             openState,
           ]);
